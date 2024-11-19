@@ -1,0 +1,89 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Director {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  age       Int
+  createdAt DateTime @default(now())
+  isActive  Boolean  @default(true)
+  agencies  Agence[]
+}
+
+model Agence {
+  id         String    @id @default(uuid())
+  street     String
+  city       String
+  state      String
+  zip        String
+  country    String
+  createdAt  DateTime  @default(now())
+  directorId String
+  director   Director  @relation(fields: [directorId], references: [id], onDelete: Cascade)
+  products   Product[]
+}
+
+model Product {
+  id        String   @id @default(uuid())
+  name      String
+  stock     Int
+  price     Float
+  createdAt DateTime @default(now())
+  agenceId  String
+  agence    Agence   @relation(fields: [agenceId], references: [id], onDelete: Cascade)
+}
+
+model User {
+  id                        Int                        @id @default(autoincrement())
+  email                     String                     @unique
+  username                  String?
+  passwordHash              String?
+  recoveryCode              String?
+  emailVerified             Boolean                    @default(false)
+  totpKey                   Bytes?
+  googleId                  String?                    @unique
+  name                      String?
+  picture                   String?
+  sessions                  Session[]
+  emailVerificationRequests EmailVerificationRequest[] @relation("UserEmailVerificationRequests")
+  passwordResetSessions     PasswordResetSession[]     @relation("UserPasswordResetSessions")
+}
+
+model Session {
+  id                String   @id @default(uuid())
+  userId            Int
+  expiresAt         DateTime
+  twoFactorVerified Boolean  @default(false)
+  oauthProvider     String?
+
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model EmailVerificationRequest {
+  id        String   @id @default(uuid())
+  userId    Int
+  email     String
+  code      String
+  expiresAt DateTime
+
+  user      User     @relation("UserEmailVerificationRequests", fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model PasswordResetSession {
+  id                String   @id @default(uuid())
+  userId            Int
+  email             String
+  code              String
+  expiresAt         DateTime
+  emailVerified     Boolean  @default(false)
+  twoFactorVerified Boolean  @default(false)
+
+  user              User     @relation("UserPasswordResetSessions", fields: [userId], references: [id], onDelete: Cascade)
+}
