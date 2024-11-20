@@ -397,7 +397,7 @@
 			intensity={batIntensity}
 			color="#FFFFFF"
 			position={[0.26, 2.94, 0.32]}
-			distance={10}
+			distance={3}
 			castShadow
 			receiveShadow
 		/>
