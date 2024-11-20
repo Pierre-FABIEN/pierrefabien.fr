@@ -11,6 +11,8 @@
 	} from '$lib/store/ThreeStore/animationStores';
 	import { tick } from 'svelte';
 
+	import '@fontsource-variable/montserrat';
+
 	gsap.registerPlugin(ScrollTrigger);
 
 	// Objets intermédiaires pour l'animation
@@ -178,6 +180,7 @@
 		border: red 2px solid;
 		width: 100%;
 		height: 100vh;
+		font-family: 'Montserrat Variable', sans-serif;
 	}
 
 	.container-text-about {
@@ -187,7 +190,8 @@
 	.container-text-suite {
 		transform: translateY(-30vh);
 	}
-	.link-music {
+
+	/* .link-music {
 		position: absolute;
 		top: 0;
 		right: 0;
@@ -202,5 +206,5 @@
 		width: 40%;
 		height: 100%;
 		z-index: 1;
-	}
+	} */
 </style>

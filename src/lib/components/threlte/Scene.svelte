@@ -35,6 +35,7 @@
 		handleMouseOut
 	} from './utils/Functions/mouseHandlers';
 	import PointLight from './utils/Light/PointLight.svelte';
+	import LetterLights from './utils/Light/LetterLights.svelte';
 
 	gsap.registerPlugin(ScrollTrigger);
 
@@ -75,7 +76,7 @@
 </script>
 
 <Canvas shadows>
-	<SoftShadows focus={10} size={10} samples={25} />
+	<SoftShadows focus={15} size={15} samples={50} />
 	<T.PerspectiveCamera bind:ref={PerspectiveCameraRef} makeDefault position={[-25, 7, 0]} fov={15}>
 		<OrbitControls
 			bind:ref={OrbitControlsRef}
@@ -140,6 +141,8 @@
 		targetRef={null}
 		targetPosition={[-30, 0, 0]}
 	/>
+
+	<LetterLights />
 
 	<Modele
 		devLettersIntensity={$devLettersIntensity}
