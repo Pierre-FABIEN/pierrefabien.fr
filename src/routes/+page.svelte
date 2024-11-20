@@ -7,8 +7,7 @@
 		cameraPosition,
 		cameraTarget,
 		pointLightIntensity,
-		PrincipalLightIntensity,
-		FlameIntensity
+		PrincipalLightIntensity
 	} from '$lib/store/ThreeStore/animationStores';
 	import { tick } from 'svelte';
 
@@ -108,19 +107,10 @@
 				// Allumer la lumière progressivement
 				gsap.to(pointLight, {
 					duration: 1,
-					value: 10,
-					ease: 'power2.out',
+					value: 20,
+					ease: 'linear',
 					onUpdate: () => {
 						pointLightIntensity.set(pointLight.value);
-					}
-				});
-
-				gsap.to(pointLight, {
-					duration: 1,
-					value: 10,
-					ease: 'power2.out',
-					onUpdate: () => {
-						FlameIntensity.set(pointLight.value);
 					}
 				});
 			},
@@ -130,18 +120,9 @@
 				gsap.to(pointLight, {
 					duration: 1,
 					value: 0,
-					ease: 'power2.out',
+					ease: 'linear',
 					onUpdate: () => {
 						pointLightIntensity.set(pointLight.value);
-					}
-				});
-
-				gsap.to(pointLight, {
-					duration: 1,
-					value: 1,
-					ease: 'power2.out',
-					onUpdate: () => {
-						FlameIntensity.set(pointLight.value);
 					}
 				});
 			}
@@ -157,24 +138,38 @@
 			if (scrollTrigger1) scrollTrigger1.kill();
 			if (scrollTrigger2) scrollTrigger2.kill();
 			if (scrollTrigger3) scrollTrigger3.kill();
+			ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
 		};
 	});
 </script>
 
 <!-- Votre code HTML pour les sections -->
 <section class="home flex justify-center content-center items-center">
-	<p>TEXTE</p>
+	<!-- <a href="/dev" class="link-music" aria-label="Go to dev section"> </a>
+	<a href="/music" class="link-dev" aria-label="Go to music section"> </a> -->
 </section>
-<section class="about flex justify-center content-center items-center">
-	<p>TEXTE</p>
+<section class="about flex flex-col justify-center items-center">
+	<p class="text-center container-text-about">
+		Hello ! welcome to my website.
+		<br />
+		I'm a web developer and musical composer from Toulouse,<br /> passionate about both art and science.
+	</p>
 </section>
 <section class="suite flex justify-center content-center items-center">
-	<p>TEXTE</p>
+	<div class="flex-col container-text-suite">
+		<p class="text-center">
+			When art and science intertwine,<br /> they form the true alchemy of creation
+		</p>
+		<br />
+		<p class="text-center">
+			a balance as intricate as the caduceus of Hermes,<br /> guiding us toward freedom.
+		</p>
+	</div>
 </section>
 <section class="ets flex justify-center content-center items-center">
 	<p>TEXTE</p>
 </section>
-<section class="ets flex justify-center content-center items-center">
+<section class="fin flex justify-center content-center items-center">
 	<p>TEXTE</p>
 </section>
 
@@ -183,6 +178,29 @@
 		border: red 2px solid;
 		width: 100%;
 		height: 100vh;
-		pointer-events: none;
+	}
+
+	.container-text-about {
+		transform: translateY(10vh);
+	}
+
+	.container-text-suite {
+		transform: translateY(-30vh);
+	}
+	.link-music {
+		position: absolute;
+		top: 0;
+		right: 0;
+		width: 40%;
+		height: 100%;
+		z-index: 1;
+	}
+	.link-dev {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 40%;
+		height: 100%;
+		z-index: 1;
 	}
 </style>

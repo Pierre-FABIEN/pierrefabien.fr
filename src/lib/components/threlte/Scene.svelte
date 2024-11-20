@@ -1,11 +1,10 @@
 <script lang="ts">
-	import { tick } from 'svelte';
 	import gsap from 'gsap';
 	import { ScrollTrigger } from 'gsap/dist/ScrollTrigger';
 	import * as THREE from 'three';
 	import { Canvas } from '@threlte/core';
 	import { T } from '@threlte/core';
-	import { OrbitControls } from '@threlte/extras';
+	import { OrbitControls, SoftShadows } from '@threlte/extras';
 
 	import Modele from './Modele.svelte';
 	import SpotLight from './utils/Light/SpotLight.svelte';
@@ -75,7 +74,8 @@
 	});
 </script>
 
-<Canvas>
+<Canvas shadows>
+	<SoftShadows focus={10} size={10} samples={25} />
 	<T.PerspectiveCamera bind:ref={PerspectiveCameraRef} makeDefault position={[-25, 7, 0]} fov={15}>
 		<OrbitControls
 			bind:ref={OrbitControlsRef}
@@ -134,11 +134,11 @@
 	<PointLight
 		helpers={false}
 		intensity={$pointLightIntensity}
-		position={[-20, 5, 0]}
+		position={[-30, 5, 0]}
 		distance={10}
 		decay={1}
 		targetRef={null}
-		targetPosition={[-20, 0, 0]}
+		targetPosition={[-30, 0, 0]}
 	/>
 
 	<Modele

@@ -33,7 +33,7 @@
 
 	// Références pour la lumière et le helper
 	let spotLightRef: THREE.SpotLight;
-	let spotLightHelper: SpotLightHelper;
+	let spotLightHelper: SpotLightHelper | null = null;
 	const defaultTargetRef = new Object3D();
 
 	// État réactif pour la cible active
@@ -47,21 +47,50 @@
 				scene.add(defaultTargetRef);
 			}
 		}
+
+		// Nettoyage lors de la destruction de l'effet
+		return () => {
+			if (scene.children.includes(defaultTargetRef)) {
+				scene.remove(defaultTargetRef);
+			}
+		};
 	});
 
 	// Mettre à jour la position de la cible de la lumière
 	$effect(() => {
 		activeTargetRef.position.set(...(targetPosition as [number, number, number]));
 		activeTargetRef.updateMatrixWorld();
+
+		// Aucun nettoyage nécessaire ici car nous ne faisons que mettre à jour la position
 	});
 
 	// Mettre à jour le helper lorsque les propriétés changent
 	$effect(() => {
-		if (helpers && spotLightHelper) {
-			spotLightHelper.update();
+		if (helpers) {
+			if (!spotLightHelper && spotLightRef) {
+				// Créer un SpotLightHelper si ce n'est pas déjà fait
+				spotLightHelper = new SpotLightHelper(spotLightRef);
+				scene.add(spotLightHelper);
+			}
+			spotLightHelper?.update();
+		} else {
+			// Si les helpers ne sont pas activés, retirer le helper s'il existe
+			if (spotLightHelper) {
+				scene.remove(spotLightHelper);
+				spotLightHelper = null;
+			}
 		}
+
+		// Nettoyage du helper lors de la destruction de l'effet
+		return () => {
+			if (spotLightHelper) {
+				scene.remove(spotLightHelper);
+				spotLightHelper = null;
+			}
+		};
 	});
 </script>
+
 
 <!-- SpotLight avec helper optionnel -->
 <T.SpotLight

@@ -11,6 +11,7 @@
 
 	let synthNode: THREE.Object3D | null = $state(null);
 	let keyboardNode: THREE.Object3D | null = $state(null);
+	let humansNode: THREE.Mesh | null = $state(null);
 
 	let batNode: THREE.Mesh | null = $state(null);
 	let batLight: THREE.PointLight | null = $state(null);
@@ -96,13 +97,18 @@
 			letterC.material.emissiveIntensity = musicLettersIntensity * 5;
 		}
 
-		const batEmissiveColor = new THREE.Color(0xffffff);
+		const batEmissiveColor = new THREE.Color(0x2c9ef5);
 		if (batNode?.material instanceof THREE.MeshStandardMaterial) {
 			batNode.material = batNode.material.clone();
 			batNode.material.emissive = batEmissiveColor;
 			batNode.material.emissiveIntensity = batIntensity * 5;
 			batNode.frustumCulled = false;
 		}
+
+		// Fonction de nettoyage des lettres et du batNode
+		return () => {
+			Object.values(timeoutIds).forEach((id) => clearTimeout(id));
+		};
 	});
 
 	// Fonction pour simuler le clignotement aléatoire
@@ -169,6 +175,11 @@
 		if (batLight && batNode) {
 			animateClignotement('bat', batLight, batNode, devLettersIntensity); // Utilisez une intensité appropriée
 		}
+
+		// Nettoyage des timeouts de clignotement lors de la destruction
+		return () => {
+			Object.values(timeoutIds).forEach((id) => clearTimeout(id));
+		};
 	});
 
 	// Tâche pour animer les objets seulement si les nœuds sont initialisés
@@ -198,12 +209,6 @@
 				let intensity = 1;
 
 				switch (id) {
-					case 'letterD':
-						light = letterDLights;
-						mesh = letterD;
-						intensity = devLettersIntensity;
-						break;
-					// ... gérer les autres lettres ...
 					case 'bat':
 						light = batLight;
 						mesh = batNode;
@@ -236,6 +241,13 @@
 		// Appliquer la rotation
 		synthNode.rotation.y += delta * 0.5;
 		keyboardNode.rotation.y += delta * 0.5;
+	});
+
+	useTask((delta) => {
+		if (!humansNode) return;
+		// Ajouter une rotation autour de l'axe Y
+		humansNode.rotation.y += delta * 0.1; // Ajustez la vitesse de rotation (0.5 est un exemple)
+		humansNode.updateMatrixWorld(); // Mettez à jour la matrice du monde
 	});
 </script>
 
@@ -281,11 +293,13 @@
 		<T.Mesh
 			castShadow
 			receiveShadow
+			bind:ref={humansNode}
 			geometry={gltf.nodes.Humans.geometry}
 			material={gltf.nodes.Humans.material}
-			position={[-20, 0, 0.1]}
+			position={[-30, 0, 0]}
 			scale={2}
 		/>
+
 		<T.Mesh
 			castShadow
 			receiveShadow
@@ -401,6 +415,9 @@
 
 		<!-- PointLight pour chaque lettre -->
 		<T.PointLight
+			shadow-mapSize-width={200}
+			shadow-mapSize-height={200}
+			shadow-bias={-0.0001}
 			bind:ref={letterDLights}
 			intensity={devLettersIntensity}
 			color="#FFFFFF"
@@ -410,6 +427,9 @@
 			receiveShadow
 		/>
 		<T.PointLight
+			shadow-mapSize-width={200}
+			shadow-mapSize-height={200}
+			shadow-bias={-0.0001}
 			bind:ref={letterELights}
 			intensity={devLettersIntensity}
 			color="#FFFFFF"
@@ -419,6 +439,9 @@
 			receiveShadow
 		/>
 		<T.PointLight
+			shadow-mapSize-width={200}
+			shadow-mapSize-height={200}
+			shadow-bias={-0.0001}
 			bind:ref={letterVLights}
 			intensity={devLettersIntensity}
 			color="#FFFFFF"
@@ -429,6 +452,9 @@
 		/>
 
 		<T.PointLight
+			shadow-mapSize-width={200}
+			shadow-mapSize-height={200}
+			shadow-bias={-0.0001}
 			bind:ref={letterMLights}
 			intensity={musicLettersIntensity}
 			color="#FFFFFF"
@@ -438,6 +464,9 @@
 			receiveShadow
 		/>
 		<T.PointLight
+			shadow-mapSize-width={200}
+			shadow-mapSize-height={200}
+			shadow-bias={-0.0001}
 			bind:ref={letterULights}
 			intensity={musicLettersIntensity}
 			color="#FFFFFF"
@@ -447,6 +476,9 @@
 			receiveShadow
 		/>
 		<T.PointLight
+			shadow-mapSize-width={200}
+			shadow-mapSize-height={200}
+			shadow-bias={-0.0001}
 			bind:ref={letterSLights}
 			intensity={musicLettersIntensity}
 			color="#FFFFFF"
@@ -456,6 +488,9 @@
 			receiveShadow
 		/>
 		<T.PointLight
+			shadow-mapSize-width={200}
+			shadow-mapSize-height={200}
+			shadow-bias={-0.0001}
 			bind:ref={letterILights}
 			intensity={musicLettersIntensity}
 			color="#FFFFFF"
@@ -465,6 +500,9 @@
 			receiveShadow
 		/>
 		<T.PointLight
+			shadow-mapSize-width={200}
+			shadow-mapSize-height={200}
+			shadow-bias={-0.0001}
 			bind:ref={letterCLights}
 			intensity={musicLettersIntensity}
 			color="#FFFFFF"
@@ -474,9 +512,12 @@
 			receiveShadow
 		/>
 		<T.PointLight
+			shadow-mapSize-width={200}
+			shadow-mapSize-height={200}
+			shadow-bias={-0.0001}
 			bind:ref={batLight}
 			intensity={batIntensity}
-			color="#FFFFFF"
+			color="#2C9EF5"
 			position={[0.26, 2.94, 0.32]}
 			distance={10}
 			castShadow

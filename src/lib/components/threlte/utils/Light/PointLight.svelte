@@ -63,6 +63,7 @@
 
 <!-- PointLight avec helper optionnel -->
 <T.PointLight
+
 	bind:ref={pointLightRef}
 	color="#FFFFFF"
 	{intensity}
@@ -70,6 +71,7 @@
 	{distance}
 	{decay}
 	target={activeTargetRef}
+	castShadow
 	oncreate={() => {
 		// Créer le helper si helpers est activé
 		if (helpers) {

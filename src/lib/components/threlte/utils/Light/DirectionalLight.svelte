@@ -20,6 +20,7 @@
 
 <!-- Lumière directionnelle principale avec helper -->
 <T.DirectionalLight
+
 	bind:ref={lightRef}
 	color="#FFFFFF"
 	intensity={1}

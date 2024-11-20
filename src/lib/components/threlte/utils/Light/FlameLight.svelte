@@ -86,4 +86,5 @@
 	{distance}
 	{decay}
 	{castShadow}
+
 />
