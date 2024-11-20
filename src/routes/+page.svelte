@@ -109,7 +109,7 @@
 				// Allumer la lumière progressivement
 				gsap.to(pointLight, {
 					duration: 1,
-					value: 20,
+					value: 50,
 					ease: 'linear',
 					onUpdate: () => {
 						pointLightIntensity.set(pointLight.value);

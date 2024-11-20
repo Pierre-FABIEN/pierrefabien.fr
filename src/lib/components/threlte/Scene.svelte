@@ -132,13 +132,13 @@
 		targetPosition={[5, 0, -10]}
 	/>
 
-	<PointLight
+	<SpotLight
 		helpers={false}
 		intensity={$pointLightIntensity}
-		position={[-30, 5, 0]}
-		distance={10}
-		decay={1}
-		targetRef={null}
+		position={[-30, 10, 0]}
+		distance={20}
+		penumbra={1}
+		angle={Math.PI / 4}
 		targetPosition={[-30, 0, 0]}
 	/>
 
