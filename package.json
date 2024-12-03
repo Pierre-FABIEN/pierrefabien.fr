@@ -76,6 +76,7 @@
 		"@oslojs/otp": "^1.0.0",
 		"@pilcrowjs/object-parser": "^0.0.4",
 		"@prisma/client": "^5.22.0",
+		"@sveltejs/adapter-vercel": "^5.5.0",
 		"@theatre/core": "^0.7.2",
 		"@threlte/core": "^8.0.0-next.30",
 		"@threlte/extras": "^9.0.0-next.39",
