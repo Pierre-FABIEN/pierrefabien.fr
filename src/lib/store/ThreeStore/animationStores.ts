@@ -25,3 +25,6 @@ export const cameraPosition = writable(new THREE.Vector3(-25, 7, 0));
 export const cameraTarget = writable(new THREE.Vector3(0, 2, 0));
 
 export const lerpFactor = writable<number>(0.2);
+
+// Section actuellement affichée (synchronisée avec la route courante dans +layout.svelte)
+export const activeSection = writable<'home' | 'dev' | 'music'>('home');

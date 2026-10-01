@@ -13,7 +13,7 @@
 		letterILights,
 		letterCLights
 	} from '$lib/store/ThreeStore/lettersStore';
-	import { disableAnimationsHome } from '$lib/store/ThreeStore/animationStores';
+	import { disableAnimationsHome, activeSection } from '$lib/store/ThreeStore/animationStores';
 
 	export const ref = new THREE.Group();
 	const dracoLoader = useDraco('/draco/');
@@ -201,8 +201,8 @@
 			keyboardNode.rotation.y += delta * 0.5;
 		}
 
-		// Rotation du humansNode
-		if (humansNode) {
+		// Rotation du humansNode (visible seulement à partir du 2e écran)
+		if (humansNode && $disableAnimationsHome) {
 			// Ajouter une rotation autour de l'axe Y
 			humansNode.rotation.y += delta * 0.1; // Ajustez la vitesse de rotation (0.1 est un exemple)
 			humansNode.updateMatrixWorld(); // Mettez à jour la matrice du monde
@@ -253,6 +253,7 @@
 		<T.Mesh
 			castShadow
 			receiveShadow
+			visible={$disableAnimationsHome}
 			bind:ref={humansNode}
 			geometry={gltf.nodes.Humans.geometry}
 			material={gltf.nodes.Humans.material}
@@ -385,6 +386,30 @@
 			castShadow
 			receiveShadow
 		/>
+
+		<!-- Placeholders section /dev et /music, en attendant un vrai contenu -->
+		<T.Mesh visible={$activeSection === 'dev'} position={[3, 9, -7]} rotation={[0, Math.PI / 2, 0]}>
+			<T.PlaneGeometry args={[2, 2]} />
+			<T.MeshStandardMaterial
+				color="#4da6ff"
+				emissive="#4da6ff"
+				emissiveIntensity={0.6}
+				side={THREE.DoubleSide}
+			/>
+		</T.Mesh>
+		<T.Mesh
+			visible={$activeSection === 'music'}
+			position={[3, 9, 7]}
+			rotation={[0, Math.PI / 2, 0]}
+		>
+			<T.CircleGeometry args={[1.4, 3]} />
+			<T.MeshStandardMaterial
+				color="#ff8a4d"
+				emissive="#ff8a4d"
+				emissiveIntensity={0.6}
+				side={THREE.DoubleSide}
+			/>
+		</T.Mesh>
 	{:catch error}
 		{@render errorSnippet?.({ error })}
 	{/await}

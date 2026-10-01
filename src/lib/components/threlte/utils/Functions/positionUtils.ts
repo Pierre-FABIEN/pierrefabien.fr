@@ -11,12 +11,15 @@ import {
 	musicLettersIntensity,
 	disableAnimationsHome,
 	desiredTarget,
-	desiredCameraPosition
+	desiredCameraPosition,
+	activeSection
 } from '$lib/store/ThreeStore/animationStores';
 
 export function updateDesiredPositions() {
-	const isDisabled = get(disableAnimationsHome);
-	if (isDisabled) return;
+	// Hors de la section 'home' (transition/section dev-music en cours), la souris ne doit
+	// plus piloter la caméra : ça entrait en conflit avec la rotation de section et
+	// provoquait un retour brutal vers le cadrage de la scène principale.
+	if (get(disableAnimationsHome) || get(activeSection) !== 'home') return;
 
 	const mouseOutside = get(isMouseOutside);
 	const mousePercent = get(mousePercentage);
@@ -35,8 +38,7 @@ export function updateDesiredPositions() {
 }
 
 export function updateLightIntensityTargets() {
-	const isDisabled = get(disableAnimationsHome);
-	if (isDisabled) return;
+	if (get(disableAnimationsHome) || get(activeSection) !== 'home') return;
 
 	const mouseOutside = get(isMouseOutside);
 	const mousePercent = get(mousePercentage);

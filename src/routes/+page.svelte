@@ -1,7 +1,18 @@
 <script lang="ts">
 	import { tick } from 'svelte';
+	import { goto } from '$app/navigation';
+	import { animateCameraToSection } from '$lib/components/threlte/utils/Functions/sectionTransition';
+	import { activeSection } from '$lib/store/ThreeStore/animationStores';
 
 	import '@fontsource-variable/montserrat';
+
+	async function handleSectionClick(event: MouseEvent, section: 'dev' | 'music') {
+		event.preventDefault();
+		// Active la section (affiche le placeholder) avant la rotation pour éviter tout pop-in
+		activeSection.set(section);
+		await animateCameraToSection(section);
+		goto(`/${section}`);
+	}
 
 	$effect(() => {
 		let destroyed = false;
@@ -22,8 +33,18 @@
 
 <!-- Votre code HTML pour les sections -->
 <section class="home flex justify-center content-center items-center">
-	<!-- <a href="/dev" class="link-music" aria-label="Go to dev section"> </a>
-	<a href="/music" class="link-dev" aria-label="Go to music section"> </a> -->
+	<a
+		href="/dev"
+		class="link-dev"
+		aria-label="Go to dev section"
+		onclick={(e) => handleSectionClick(e, 'dev')}
+	></a>
+	<a
+		href="/music"
+		class="link-music"
+		aria-label="Go to music section"
+		onclick={(e) => handleSectionClick(e, 'music')}
+	></a>
 </section>
 <section class="about flex flex-col justify-center items-center">
 	<p class="text-center container-text-about">
@@ -66,7 +87,7 @@
 		transform: translateY(-30vh);
 	}
 
-	/* .link-music {
+	.link-music {
 		position: absolute;
 		top: 0;
 		right: 0;
@@ -81,5 +102,5 @@
 		width: 40%;
 		height: 100%;
 		z-index: 1;
-	} */
+	}
 </style>

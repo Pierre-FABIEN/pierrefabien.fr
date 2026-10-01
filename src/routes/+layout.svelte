@@ -13,6 +13,7 @@
 	import Loader from '$lib/components/loader/Loader.svelte';
 	import { page } from '$app/state';
 	import type { Component } from 'svelte';
+	import { activeSection } from '$lib/store/ThreeStore/animationStores';
 
 	let { children } = $props();
 
@@ -25,6 +26,17 @@
 		setupNavigationEffect();
 		setFirstOpen(true);
 		setRessourceToValide(true);
+	});
+
+	// Synchronise la section 3D active (meshes à afficher) avec la route courante
+	$effect(() => {
+		if (page.route.id === '/dev') {
+			activeSection.set('dev');
+		} else if (page.route.id === '/music') {
+			activeSection.set('music');
+		} else {
+			activeSection.set('home');
+		}
 	});
 
 	$effect(() => {
