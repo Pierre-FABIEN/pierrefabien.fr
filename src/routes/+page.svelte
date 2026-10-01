@@ -2,15 +2,23 @@
 	import { tick } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { animateCameraToSection } from '$lib/components/threlte/utils/Functions/sectionTransition';
-	import { activeSection } from '$lib/store/ThreeStore/animationStores';
+	import {
+		activeSection,
+		disableAnimationsHome,
+		homeSceneVisible
+	} from '$lib/store/ThreeStore/animationStores';
 
 	import '@fontsource-variable/montserrat';
 
 	async function handleSectionClick(event: MouseEvent, section: 'dev' | 'music') {
 		event.preventDefault();
+		// Liens valables uniquement sur le premier écran (home)
+		if ($disableAnimationsHome) return;
 		// Active la section (affiche le placeholder) avant la rotation pour éviter tout pop-in
 		activeSection.set(section);
 		await animateCameraToSection(section);
+		// La scène d'accueil ne disparaît qu'une fois la rotation terminée
+		homeSceneVisible.set(false);
 		goto(`/${section}`);
 	}
 
@@ -37,12 +45,14 @@
 		href="/dev"
 		class="link-dev"
 		aria-label="Go to dev section"
+		inert={$disableAnimationsHome}
 		onclick={(e) => handleSectionClick(e, 'dev')}
 	></a>
 	<a
 		href="/music"
 		class="link-music"
 		aria-label="Go to music section"
+		inert={$disableAnimationsHome}
 		onclick={(e) => handleSectionClick(e, 'music')}
 	></a>
 </section>
@@ -94,6 +104,10 @@
 		width: 40%;
 		height: 100%;
 		z-index: 1;
+	}
+	.link-music[inert],
+	.link-dev[inert] {
+		pointer-events: none;
 	}
 	.link-dev {
 		position: absolute;

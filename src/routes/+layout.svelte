@@ -13,7 +13,6 @@
 	import Loader from '$lib/components/loader/Loader.svelte';
 	import { page } from '$app/state';
 	import type { Component } from 'svelte';
-	import { activeSection } from '$lib/store/ThreeStore/animationStores';
 
 	let { children } = $props();
 
@@ -28,21 +27,21 @@
 		setRessourceToValide(true);
 	});
 
-	// Synchronise la section 3D active (meshes à afficher) avec la route courante
-	$effect(() => {
-		if (page.route.id === '/dev') {
-			activeSection.set('dev');
-		} else if (page.route.id === '/music') {
-			activeSection.set('music');
-		} else {
-			activeSection.set('home');
-		}
-	});
-
 	$effect(() => {
 		if ($isClient && !Scene) {
 			import('$lib/components/threlte/Scene.svelte').then((module) => {
 				Scene = module.default;
+			});
+		}
+	});
+
+	$effect(() => {
+		if ($isClient && import.meta.env.PROD) {
+			// Généré par vite-plugin-pwa (voir vite.config.ts) : enregistre le service worker
+			// pour le cache offline, mis à jour automatiquement en arrière-plan. Pas de SW en
+			// dev (non généré par défaut par vite-plugin-pwa), d'où le garde-fou PROD.
+			import('virtual:pwa-register').then(({ registerSW }) => {
+				registerSW({ immediate: true });
 			});
 		}
 	});

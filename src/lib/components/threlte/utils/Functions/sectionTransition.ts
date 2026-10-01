@@ -7,9 +7,9 @@ import * as THREE from 'three';
 import { get } from 'svelte/store';
 import { desiredTarget } from '$lib/store/ThreeStore/animationStores';
 
-type Section = 'dev' | 'music';
+export type Section = 'dev' | 'music';
 
-const sectionTarget: Record<Section, THREE.Vector3> = {
+export const sectionTarget: Record<Section, THREE.Vector3> = {
 	dev: new THREE.Vector3(3, 9, -7),
 	music: new THREE.Vector3(3, 9, 7)
 };

@@ -14,12 +14,13 @@
 	import {
 		devLettersIntensity,
 		musicLettersIntensity,
-		disableAnimationsHome
+		disableAnimationsHome,
+		homeSceneVisible
 	} from '$lib/store/ThreeStore/animationStores';
 </script>
 
-<!-- Lettres DEV/MUSIC masquées à partir du 2e écran -->
-<T.Group visible={!$disableAnimationsHome}>
+<!-- Lettres DEV/MUSIC masquées à partir du 2e écran, ou une fois la scène d'accueil masquée -->
+<T.Group visible={!$disableAnimationsHome && $homeSceneVisible}>
 	<T.SpotLight
 		bind:ref={$letterDLights}
 		intensity={$devLettersIntensity / 2}

@@ -4,9 +4,9 @@ import { get } from 'svelte/store';
 
 // Import des stores nécessaires
 import {
-	disableAnimationsHome,
 	isMouseOutside,
-	mousePercentage
+	mousePercentage,
+	homeInteractive
 } from '$lib/store/ThreeStore/animationStores';
 
 // Import des fonctions nécessaires avec le bon chemin
@@ -29,7 +29,7 @@ function processMouseMove(event: MouseEvent): void {
 
 // Fonctions de gestion de la souris (comme précédemment)
 export function handleMouseMove(event: MouseEvent): void {
-	if (get(disableAnimationsHome)) return;
+	if (!get(homeInteractive)) return;
 
 	pendingMouseEvent = event;
 	if (rafScheduled) return;
@@ -45,7 +45,7 @@ export function handleMouseMove(event: MouseEvent): void {
 }
 
 export function handleMouseOut(event: MouseEvent): void {
-	if (!event.relatedTarget || get(disableAnimationsHome)) {
+	if (!event.relatedTarget || !get(homeInteractive)) {
 		isMouseOutside.set(true);
 		updateDesiredPositions();
 		updateLightIntensityTargets();
@@ -53,7 +53,7 @@ export function handleMouseOut(event: MouseEvent): void {
 }
 
 export function handleMouseEnter(): void {
-	if (!get(disableAnimationsHome)) {
+	if (get(homeInteractive)) {
 		isMouseOutside.set(false);
 		updateDesiredPositions();
 		updateLightIntensityTargets();

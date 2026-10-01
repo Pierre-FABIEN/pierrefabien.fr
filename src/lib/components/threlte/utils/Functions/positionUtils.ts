@@ -9,17 +9,16 @@ import {
 	targetRightIntensity,
 	devLettersIntensity,
 	musicLettersIntensity,
-	disableAnimationsHome,
 	desiredTarget,
 	desiredCameraPosition,
-	activeSection
+	homeInteractive
 } from '$lib/store/ThreeStore/animationStores';
 
 export function updateDesiredPositions() {
-	// Hors de la section 'home' (transition/section dev-music en cours), la souris ne doit
-	// plus piloter la caméra : ça entrait en conflit avec la rotation de section et
-	// provoquait un retour brutal vers le cadrage de la scène principale.
-	if (get(disableAnimationsHome) || get(activeSection) !== 'home') return;
+	// Hors du 1er écran de la home (scrollé, ou sur /dev-/music), la souris ne doit plus
+	// piloter la caméra : ça entrait en conflit avec la rotation de section et provoquait
+	// un retour brutal vers le cadrage de la scène principale.
+	if (!get(homeInteractive)) return;
 
 	const mouseOutside = get(isMouseOutside);
 	const mousePercent = get(mousePercentage);
@@ -31,14 +30,14 @@ export function updateDesiredPositions() {
 		const targetZ = THREE.MathUtils.lerp(-5, 5, mousePercent);
 		desiredTarget.set(new THREE.Vector3(0, 2, targetZ));
 
-		const cameraX = THREE.MathUtils.lerp(-25, -25, 1 - mousePercent);
+		// La caméra reste sur l'axe x=-25, seul z varie selon la position de la souris
 		const cameraZ = THREE.MathUtils.lerp(-6, 6, 1 - mousePercent);
-		desiredCameraPosition.set(new THREE.Vector3(cameraX, 7, cameraZ));
+		desiredCameraPosition.set(new THREE.Vector3(-25, 7, cameraZ));
 	}
 }
 
 export function updateLightIntensityTargets() {
-	if (get(disableAnimationsHome) || get(activeSection) !== 'home') return;
+	if (!get(homeInteractive)) return;
 
 	const mouseOutside = get(isMouseOutside);
 	const mousePercent = get(mousePercentage);

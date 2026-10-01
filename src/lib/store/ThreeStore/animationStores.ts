@@ -1,4 +1,4 @@
-import { writable } from 'svelte/store';
+import { derived, writable } from 'svelte/store';
 import * as THREE from 'three';
 
 // Création des stores
@@ -28,3 +28,14 @@ export const lerpFactor = writable<number>(0.2);
 
 // Section actuellement affichée (synchronisée avec la route courante dans +layout.svelte)
 export const activeSection = writable<'home' | 'dev' | 'music'>('home');
+
+// Visibilité des meshes/lumières de la scène d'accueil : reste true pendant la rotation
+// de caméra vers une section, puis passe à false une fois l'animation terminée.
+export const homeSceneVisible = writable<boolean>(true);
+
+// true uniquement sur le 1er écran de la home (ni scrollé, ni sur /dev ou /music) :
+// seul moment où la souris doit piloter caméra/lumières.
+export const homeInteractive = derived(
+	[disableAnimationsHome, activeSection],
+	([$disableAnimationsHome, $activeSection]) => !$disableAnimationsHome && $activeSection === 'home'
+);
