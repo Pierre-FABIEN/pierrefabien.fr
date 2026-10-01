@@ -7,7 +7,6 @@
 	import Marquee from '$components/Marquee.svelte';
 	import { magnetic } from '$lib/actions/magnetic';
 	import { tilt } from '$lib/actions/tilt';
-	import CustomCursor from '$components/CustomCursor.svelte';
 
 	type Experience = {
 		period: string;
@@ -212,8 +211,6 @@
 </script>
 
 <div class="dev-page">
-	<CustomCursor />
-
 	<section class="hero">
 		<span class="section-number">00</span>
 		<h1 class="display">Pierre<br />Fabien</h1>
@@ -227,28 +224,24 @@
 		<div class="links">
 			<a
 				use:magnetic
-				data-cursor-hover
 				href="https://github.com/Pierre-FABIEN"
 				target="_blank"
 				rel="noopener noreferrer">GitHub</a
 			>
 			<a
 				use:magnetic
-				data-cursor-hover
 				href="https://www.linkedin.com/in/pierre-fabien/"
 				target="_blank"
 				rel="noopener noreferrer">LinkedIn</a
 			>
 			<a
 				use:magnetic
-				data-cursor-hover
 				href="https://pierre-fabien-cv.vercel.app/"
 				target="_blank"
 				rel="noopener noreferrer">CV interactif</a
 			>
 			<a
 				use:magnetic
-				data-cursor-hover
 				href="https://pierre-fabien-cv.vercel.app/CV_Pierre-FABIEN.pdf"
 				target="_blank"
 				rel="noopener noreferrer">PDF</a
@@ -266,7 +259,7 @@
 		<div class="skills-grid">
 			{#each Object.entries(skills) as [category, items] (category)}
 				<div class="tilt-wrapper" use:tilt>
-					<Card.Root data-cursor-hover class={cardBase}>
+					<Card.Root class={cardBase}>
 						<Card.Header>
 							<Card.Title>{category}</Card.Title>
 						</Card.Header>
@@ -291,7 +284,6 @@
 				{#each experiences as exp (exp.company + exp.period)}
 					<div class="tilt-wrapper" use:tilt>
 						<Card.Root
-							data-cursor-hover
 							class={cn(cardBase, 'timeline-card', exp.highlight && 'border-primary bg-primary/10')}
 						>
 							<Card.Header>
@@ -326,7 +318,7 @@
 		<div class="projects-grid">
 			{#each projects as project (project.name)}
 				<div class="tilt-wrapper" use:tilt>
-					<Card.Root data-cursor-hover class={cardBase}>
+					<Card.Root class={cardBase}>
 						<Card.Header>
 							<Card.Title>{project.name}</Card.Title>
 							<Card.Description>{project.description}</Card.Description>
@@ -367,18 +359,6 @@
 		gap: 8rem;
 		max-width: 72rem;
 		margin: 0 auto;
-	}
-
-	@media (hover: hover) and (pointer: fine) {
-		.dev-page {
-			cursor: none;
-		}
-	}
-
-	@media (prefers-reduced-motion: reduce) {
-		.dev-page {
-			cursor: auto;
-		}
 	}
 
 	.section-number {
