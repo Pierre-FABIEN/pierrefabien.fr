@@ -2,7 +2,7 @@
 	import * as THREE from 'three';
 	import { T, useTask } from '@threlte/core';
 	import { useDraco, useGltf } from '@threlte/extras';
-	import { get } from 'svelte/store';
+	import type { Snippet } from 'svelte';
 	import {
 		letterDLights,
 		letterELights,
@@ -13,52 +13,66 @@
 		letterILights,
 		letterCLights
 	} from '$lib/store/ThreeStore/lettersStore';
+	import { disableAnimationsHome } from '$lib/store/ThreeStore/animationStores';
 
 	export const ref = new THREE.Group();
 	const dracoLoader = useDraco('/draco/');
 
 	const gltf = useGltf('/models/modeleDraco.glb', { dracoLoader });
-	let { devLettersIntensity, musicLettersIntensity } = $props();
+	let {
+		devLettersIntensity,
+		musicLettersIntensity,
+		fallback,
+		errorSnippet,
+		children
+	}: {
+		devLettersIntensity: number;
+		musicLettersIntensity: number;
+		fallback?: Snippet;
+		errorSnippet?: Snippet<[{ error: unknown }]>;
+		children?: Snippet<[{ ref: THREE.Group }]>;
+	} = $props();
 
-	let synthNode: THREE.Object3D | null = $state(null);
-	let keyboardNode: THREE.Object3D | null = $state(null);
-	let humansNode: THREE.Mesh | null = $state(null);
+	let synthNode: THREE.Mesh | undefined = $state();
+	let keyboardNode: THREE.Mesh | undefined = $state();
+	let humansNode: THREE.Mesh | undefined = $state();
 
-	let batNode: THREE.Mesh | null = $state(null);
-	let batLight: THREE.PointLight | null = $state(null);
+	let batNode: THREE.Mesh | undefined = $state();
+	let batLight: THREE.PointLight | undefined = $state();
 	let batIntensity = 1; // Vous pouvez ajuster l'intensité selon vos besoins
 
 	// Références des objets
-	let letterD: THREE.Mesh | null = $state(null);
-	let letterE: THREE.Mesh | null = $state(null);
-	let letterV: THREE.Mesh | null = $state(null);
-	let letterM: THREE.Mesh | null = $state(null);
-	let letterU: THREE.Mesh | null = $state(null);
-	let letterS: THREE.Mesh | null = $state(null);
-	let letterI: THREE.Mesh | null = $state(null);
-	let letterC: THREE.Mesh | null = $state(null);
+	let letterD: THREE.Mesh | undefined = $state();
+	let letterE: THREE.Mesh | undefined = $state();
+	let letterV: THREE.Mesh | undefined = $state();
+	let letterM: THREE.Mesh | undefined = $state();
+	let letterU: THREE.Mesh | undefined = $state();
+	let letterS: THREE.Mesh | undefined = $state();
+	let letterI: THREE.Mesh | undefined = $state();
+	let letterC: THREE.Mesh | undefined = $state();
 
-	// Variables pour gérer les timeout de clignotement
-	let timeoutIds: { [key: string]: number } = {};
-
-	// Variables pour l'animation de clignotement
-	let blinkTimers: { [key: string]: number } = {};
-	let blinkDurations: { [key: string]: number } = {};
-
-	// Initialiser les durées de clignotement
-	function initBlinkDuration(id: string) {
-		blinkDurations[id] = Math.random() * 0.5 + 0.1; // Durée entre 0.1s et 0.6s
+	// Rend le matériau "possédé" par ce mesh (cloné une seule fois, via un flag sur
+	// le matériau lui-même) pour pouvoir le faire clignoter sans affecter les meshes
+	// qui partagent le même matériau source dans le glTF.
+	function ownMaterial(node: THREE.Mesh | undefined): THREE.MeshStandardMaterial | undefined {
+		if (!node || !(node.material instanceof THREE.MeshStandardMaterial)) return undefined;
+		if (!node.material.userData.isEmissiveClone) {
+			const cloned = node.material.clone();
+			cloned.userData.isEmissiveClone = true;
+			node.material = cloned;
+			return cloned;
+		}
+		return node.material;
 	}
 
 	// Appliquer une lumière et un matériau émissif à chaque lettre
 	$effect(() => {
 		// Fonction pour appliquer l'émission lumineuse à une lettre
-		const applyEmissive = (node, color, intensity) => {
-			if (node?.material instanceof THREE.MeshStandardMaterial) {
-				node.material = node.material.clone();
-				node.material.emissive = color;
-				node.material.emissiveIntensity = intensity * 5;
-			}
+		const applyEmissive = (node: THREE.Mesh | undefined, color: THREE.Color, intensity: number) => {
+			const material = ownMaterial(node);
+			if (!material) return;
+			material.emissive = color;
+			material.emissiveIntensity = intensity * 5;
 		};
 
 		// Couleurs d'émission lumineuse
@@ -77,139 +91,105 @@
 		);
 
 		// Appliquer l'émission lumineuse au batNode
-		if (batNode?.material instanceof THREE.MeshStandardMaterial) {
-			batNode.material = batNode.material.clone();
-			batNode.material.emissive = batEmissiveColor;
-			batNode.material.emissiveIntensity = batIntensity * 5;
-			batNode.frustumCulled = false;
+		const batMaterial = ownMaterial(batNode);
+		if (batMaterial) {
+			batMaterial.emissive = batEmissiveColor;
+			batMaterial.emissiveIntensity = batIntensity * 5;
+			if (batNode) batNode.frustumCulled = false;
 		}
-
-		// Fonction pour animer le clignotement des lettres
-		const clignoter = (name, lights, node, intensity) => {
-			if (lights && node) {
-				animateClignotement(name, lights, node, intensity);
-			}
-		};
-
-		// Clignotement indépendant pour chaque lettre
-		[
-			{
-				name: 'letterD',
-				lights: get(letterDLights),
-				node: letterD,
-				intensity: devLettersIntensity
-			},
-			{
-				name: 'letterE',
-				lights: get(letterELights),
-				node: letterE,
-				intensity: devLettersIntensity
-			},
-			{
-				name: 'letterV',
-				lights: get(letterVLights),
-				node: letterV,
-				intensity: devLettersIntensity
-			},
-			{
-				name: 'letterM',
-				lights: get(letterMLights),
-				node: letterM,
-				intensity: musicLettersIntensity
-			},
-			{
-				name: 'letterU',
-				lights: get(letterULights),
-				node: letterU,
-				intensity: musicLettersIntensity
-			},
-			{
-				name: 'letterS',
-				lights: get(letterSLights),
-				node: letterS,
-				intensity: musicLettersIntensity
-			},
-			{
-				name: 'letterI',
-				lights: get(letterILights),
-				node: letterI,
-				intensity: musicLettersIntensity
-			},
-			{
-				name: 'letterC',
-				lights: get(letterCLights),
-				node: letterC,
-				intensity: musicLettersIntensity
-			},
-			{ name: 'bat', lights: batLight, node: batNode, intensity: devLettersIntensity }
-		].forEach(({ name, lights, node, intensity }) => clignoter(name, lights, node, intensity));
-
-		// Fonction de nettoyage des lettres et du batNode
-		return () => {
-			Object.values(timeoutIds).forEach((id) => clearTimeout(id));
-		};
 	});
 
-	// Fonction pour simuler le clignotement aléatoire
-	function randomIntensity() {
-		return Math.random() < 0.5 ? 0 : Math.random(); // 0 pour extinction, sinon un nombre entre 0 et 1
+	// État de clignotement par objet (lettre ou bat) : une phase "stable" longue
+	// (lumière fixe) entrecoupée de courtes rafales d'à-coups façon néon défaillant.
+	interface BlinkState {
+		timer: number;
+		phaseDuration: number;
+		glitchStepsLeft: number;
+	}
+	const blinkStates: { [key: string]: BlinkState } = {};
+
+	function randomStableDuration() {
+		return 0.4 + Math.random() * 1.4; // lumière stable entre 0.4s et 1.8s (rafales plus fréquentes)
+	}
+	function randomGlitchStepDuration() {
+		return 0.025 + Math.random() * 0.055; // à-coup entre 25ms et 80ms (flicker plus net)
 	}
 
-	// Fonction d'animation pour gérer le clignotement synchronisé
-	function animateClignotement(
-		letterId: string,
-		light: THREE.PointLight | null,
-		mesh: THREE.Mesh | null,
+	// emissiveIntensity est un simple uniform : pas besoin de needsUpdate (qui
+	// peut forcer une recompilation de shader) pour le mettre à jour.
+	function applyLightIntensity(
+		light: THREE.Light | null | undefined,
+		mesh: THREE.Mesh | undefined,
+		value: number
+	) {
+		if (light) light.intensity = value;
+		if (mesh?.material instanceof THREE.MeshStandardMaterial) {
+			mesh.material.emissiveIntensity = value;
+		}
+	}
+
+	// Clignotement synchronisé au render loop de Threlte (plutôt que des setTimeout
+	// récursifs indépendants) : une seule tâche gère toutes les lettres + le bat.
+	function updateBlink(
+		id: string,
+		delta: number,
+		light: THREE.Light | null | undefined,
+		mesh: THREE.Mesh | undefined,
 		intensity: number
 	) {
-		// Vérifier si un timeout est déjà en cours et le nettoyer
-		if (timeoutIds[letterId]) {
-			clearTimeout(timeoutIds[letterId]);
+		let state = blinkStates[id];
+		if (!state) {
+			state = blinkStates[id] = {
+				timer: 0,
+				phaseDuration: randomStableDuration(),
+				glitchStepsLeft: 0
+			};
+			applyLightIntensity(light, mesh, intensity * 5);
+			return;
 		}
 
-		// Clignotement des lettres 'DEV' et 'MUSIC'
-		const randomIntensityValue = randomIntensity();
-		if (light) {
-			light.intensity = intensity * randomIntensityValue * 5;
-		}
-		if (mesh?.material instanceof THREE.MeshStandardMaterial) {
-			mesh.material.emissiveIntensity = intensity * randomIntensityValue * 5;
+		state.timer += delta;
+		if (state.timer < state.phaseDuration) return;
+		state.timer = 0;
+
+		if (state.glitchStepsLeft > 0) {
+			state.glitchStepsLeft--;
+			if (state.glitchStepsLeft === 0) {
+				// fin de la rafale : la lumière se stabilise à nouveau
+				applyLightIntensity(light, mesh, intensity * 5);
+				state.phaseDuration = randomStableDuration();
+			} else {
+				// contraste franc tout-ou-rien (plus intense qu'un simple palier de luminosité)
+				const isOffStep = state.glitchStepsLeft % 2 === 0;
+				applyLightIntensity(light, mesh, isOffStep ? 0 : intensity * 5);
+				state.phaseDuration = randomGlitchStepDuration();
+			}
+			return;
 		}
 
-		// Reprogrammer le clignotement pour chaque lettre avec un délai aléatoire
-		const randomDelay = Math.random() * 500 + 100; // Délai entre 100 ms et 600 ms
-		timeoutIds[letterId] = setTimeout(
-			() => animateClignotement(letterId, light, mesh, intensity),
-			randomDelay
-		);
+		// 65% de chance de déclencher une rafale de 4 à 8 à-coups avant de se restabiliser
+		if (Math.random() < 0.65) {
+			state.glitchStepsLeft = 4 + Math.floor(Math.random() * 5);
+			state.phaseDuration = randomGlitchStepDuration();
+		} else {
+			state.phaseDuration = randomStableDuration();
+		}
 	}
 
 	// Tâche pour animer les objets seulement si les nœuds sont initialisés
 	useTask((delta) => {
-		// Clignotement de 'bat'
-		if (!blinkTimers['bat']) {
-			blinkTimers['bat'] = 0;
-			initBlinkDuration('bat');
-		}
-		blinkTimers['bat'] += delta;
+		updateBlink('bat', delta, batLight, batNode, batIntensity);
 
-		if (blinkTimers['bat'] >= blinkDurations['bat']) {
-			// Basculer l'intensité
-			const randomIntensityValue = randomIntensity();
-
-			if (batLight) {
-				batLight.intensity = batIntensity * randomIntensityValue * 5;
-				batLight.updateMatrix();
-				batLight.updateMatrixWorld();
-			}
-			if (batNode?.material instanceof THREE.MeshStandardMaterial) {
-				batNode.material.emissiveIntensity = batIntensity * randomIntensityValue * 5;
-				batNode.material.needsUpdate = true;
-			}
-
-			// Réinitialiser le timer et la durée
-			blinkTimers['bat'] = 0;
-			initBlinkDuration('bat');
+		// Lettres DEV/MUSIC masquées à partir du 2e écran : inutile de les faire clignoter
+		if (!$disableAnimationsHome) {
+			updateBlink('letterD', delta, $letterDLights, letterD, devLettersIntensity);
+			updateBlink('letterE', delta, $letterELights, letterE, devLettersIntensity);
+			updateBlink('letterV', delta, $letterVLights, letterV, devLettersIntensity);
+			updateBlink('letterM', delta, $letterMLights, letterM, musicLettersIntensity);
+			updateBlink('letterU', delta, $letterULights, letterU, musicLettersIntensity);
+			updateBlink('letterS', delta, $letterSLights, letterS, musicLettersIntensity);
+			updateBlink('letterI', delta, $letterILights, letterI, musicLettersIntensity);
+			updateBlink('letterC', delta, $letterCLights, letterC, musicLettersIntensity);
 		}
 
 		// Rotation des synthNode et keyboardNode
@@ -230,13 +210,14 @@
 	});
 </script>
 
-<T is={ref} dispose={false}>
+<T is={ref}>
 	{#await gltf}
-		<slot name="fallback" />
+		{@render fallback?.()}
 	{:then gltf}
 		<T.Mesh
 			castShadow
 			receiveShadow
+			visible={!$disableAnimationsHome}
 			geometry={gltf.nodes.Desk.geometry}
 			material={gltf.nodes.Desk.material}
 			position={[4.62, 1.02, -6.8]}
@@ -292,6 +273,7 @@
 		<T.Mesh
 			castShadow
 			receiveShadow
+			visible={!$disableAnimationsHome}
 			geometry={gltf.nodes.Piano.geometry}
 			material={gltf.nodes.Piano.material}
 			position={[4.6, 0.72, 6.85]}
@@ -307,90 +289,92 @@
 			bind:ref={synthNode}
 		/>
 
-		<T.Mesh
-			castShadow
-			receiveShadow
-			bind:ref={letterD}
-			geometry={gltf.nodes.letterD.geometry}
-			material={gltf.nodes.letterD.material}
-			position={[3.44, 1.65, -8.21]}
-			rotation={[Math.PI / 2, 0, 0.68]}
-			scale={[0.57, 0.66, 0.49]}
-		/>
-		<T.Mesh
-			castShadow
-			receiveShadow
-			bind:ref={letterE}
-			geometry={gltf.nodes.letterE.geometry}
-			material={gltf.nodes.letterE.material}
-			position={[4.15, 1.8, -7.68]}
-			rotation={[Math.PI / 2, 0, 0.68]}
-			scale={[0.57, 0.66, 0.49]}
-		/>
+		<T.Group visible={!$disableAnimationsHome}>
+			<T.Mesh
+				castShadow
+				receiveShadow
+				bind:ref={letterD}
+				geometry={gltf.nodes.letterD.geometry}
+				material={gltf.nodes.letterD.material}
+				position={[3.44, 1.65, -8.21]}
+				rotation={[Math.PI / 2, 0, 0.68]}
+				scale={[0.57, 0.66, 0.49]}
+			/>
+			<T.Mesh
+				castShadow
+				receiveShadow
+				bind:ref={letterE}
+				geometry={gltf.nodes.letterE.geometry}
+				material={gltf.nodes.letterE.material}
+				position={[4.15, 1.8, -7.68]}
+				rotation={[Math.PI / 2, 0, 0.68]}
+				scale={[0.57, 0.66, 0.49]}
+			/>
 
-		<T.Mesh
-			castShadow
-			receiveShadow
-			bind:ref={letterV}
-			geometry={gltf.nodes.letterV.geometry}
-			material={gltf.nodes.letterV.material}
-			position={[4.75, 2.01, -7.21]}
-			rotation={[Math.PI / 2, 0, 0.68]}
-			scale={[0.57, 0.66, 0.49]}
-		/>
+			<T.Mesh
+				castShadow
+				receiveShadow
+				bind:ref={letterV}
+				geometry={gltf.nodes.letterV.geometry}
+				material={gltf.nodes.letterV.material}
+				position={[4.75, 2.01, -7.21]}
+				rotation={[Math.PI / 2, 0, 0.68]}
+				scale={[0.57, 0.66, 0.49]}
+			/>
 
-		<T.Mesh
-			castShadow
-			receiveShadow
-			bind:ref={letterM}
-			geometry={gltf.nodes.letterM.geometry}
-			material={gltf.nodes.letterM.material}
-			position={[5.36, 1.64, 6.74]}
-			rotation={[1.48, -0.2, 1.92]}
-			scale={[0.49, 0.52, 0.64]}
-		/>
-		<T.Mesh
-			castShadow
-			receiveShadow
-			bind:ref={letterU}
-			geometry={gltf.nodes.letterU.geometry}
-			material={gltf.nodes.letterU.material}
-			position={[5.2, 1.78, 7.98]}
-			rotation={[1.44, -0.31, -1.11]}
-			scale={[0.49, 0.52, 0.64]}
-		/>
+			<T.Mesh
+				castShadow
+				receiveShadow
+				bind:ref={letterM}
+				geometry={gltf.nodes.letterM.geometry}
+				material={gltf.nodes.letterM.material}
+				position={[5.36, 1.64, 6.74]}
+				rotation={[1.48, -0.2, 1.92]}
+				scale={[0.49, 0.52, 0.64]}
+			/>
+			<T.Mesh
+				castShadow
+				receiveShadow
+				bind:ref={letterU}
+				geometry={gltf.nodes.letterU.geometry}
+				material={gltf.nodes.letterU.material}
+				position={[5.2, 1.78, 7.98]}
+				rotation={[1.44, -0.31, -1.11]}
+				scale={[0.49, 0.52, 0.64]}
+			/>
 
-		<T.Mesh
-			castShadow
-			receiveShadow
-			bind:ref={letterS}
-			geometry={gltf.nodes.letterS.geometry}
-			material={gltf.nodes.letterS.material}
-			position={[4.69, 2.35, 8.9]}
-			rotation={[1.41, -0.2, 1.94]}
-			scale={[0.49, 0.52, 0.64]}
-		/>
-		<T.Mesh
-			castShadow
-			receiveShadow
-			bind:ref={letterI}
-			geometry={gltf.nodes.letterI.geometry}
-			material={gltf.nodes.letterI.material}
-			position={[4.1, 2.34, 9.21]}
-			rotation={[1.57, -0.43, 1.99]}
-			scale={[0.49, 0.52, 0.64]}
-		/>
+			<T.Mesh
+				castShadow
+				receiveShadow
+				bind:ref={letterS}
+				geometry={gltf.nodes.letterS.geometry}
+				material={gltf.nodes.letterS.material}
+				position={[4.69, 2.35, 8.9]}
+				rotation={[1.41, -0.2, 1.94]}
+				scale={[0.49, 0.52, 0.64]}
+			/>
+			<T.Mesh
+				castShadow
+				receiveShadow
+				bind:ref={letterI}
+				geometry={gltf.nodes.letterI.geometry}
+				material={gltf.nodes.letterI.material}
+				position={[4.1, 2.34, 9.21]}
+				rotation={[1.57, -0.43, 1.99]}
+				scale={[0.49, 0.52, 0.64]}
+			/>
 
-		<T.Mesh
-			castShadow
-			receiveShadow
-			bind:ref={letterC}
-			geometry={gltf.nodes.letterC.geometry}
-			material={gltf.nodes.letterC.material}
-			position={[4.19, 2.3, 9.97]}
-			rotation={[1.34, -0.11, 2.31]}
-			scale={[0.49, 0.52, 0.64]}
-		/>
+			<T.Mesh
+				castShadow
+				receiveShadow
+				bind:ref={letterC}
+				geometry={gltf.nodes.letterC.geometry}
+				material={gltf.nodes.letterC.material}
+				position={[4.19, 2.3, 9.97]}
+				rotation={[1.34, -0.11, 2.31]}
+				scale={[0.49, 0.52, 0.64]}
+			/>
+		</T.Group>
 
 		<T.PointLight
 			bind:ref={batLight}
@@ -402,8 +386,8 @@
 			receiveShadow
 		/>
 	{:catch error}
-		<slot name="error" {error} />
+		{@render errorSnippet?.({ error })}
 	{/await}
 
-	<slot {ref} />
+	{@render children?.({ ref })}
 </T>

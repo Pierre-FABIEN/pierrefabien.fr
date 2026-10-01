@@ -8,7 +8,6 @@ export function updateCamera(PerspectiveCameraRef: THREE.PerspectiveCamera, Orbi
 	const unsubscribePosition = cameraPosition.subscribe((position) => {
 		if (PerspectiveCameraRef) {
 			PerspectiveCameraRef.position.lerp(position, get(lerpFactor));
-			PerspectiveCameraRef.updateProjectionMatrix();
 		}
 	});
 

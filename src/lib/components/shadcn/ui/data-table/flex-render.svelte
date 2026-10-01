@@ -30,10 +30,10 @@
 
 {#if typeof content === 'string'}
 	{content}
-{:else if content instanceof Function}
+{:else if (content as unknown) instanceof Function}
 	<!-- It's unlikely that a CellContext will be passed to a Header -->
 	<!-- eslint-disable-next-line @typescript-eslint/no-explicit-any -->
-	{@const result = content(context as any)}
+	{@const result = (content as any)(context as any)}
 	{#if result instanceof RenderComponentConfig}
 		{@const { component: Component, props } = result}
 		<Component {...props} />

@@ -23,7 +23,7 @@
 	} = $props();
 
 	// Références pour la lumière et le helper
-	let flameLightRef: THREE.PointLight;
+	let flameLightRef = $state<THREE.PointLight>()!;
 	let flameLightHelper: PointLightHelper;
 
 	// Accéder à la scène via Threlte
@@ -86,5 +86,4 @@
 	{distance}
 	{decay}
 	{castShadow}
-
 />

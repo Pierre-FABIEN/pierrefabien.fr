@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test';
 
-test('home page has expected h1', async ({ page }) => {
+test('home page loads and shows the about section', async ({ page }) => {
 	await page.goto('/');
-	await expect(page.locator('h1')).toBeVisible();
+	await expect(page).toHaveTitle(/Pierre Fabien/);
+	await expect(page.locator('.about')).toContainText('web developer');
 });

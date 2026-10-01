@@ -3,8 +3,9 @@
 	import gsap from 'gsap';
 	import ScrollTrigger from 'gsap/dist/ScrollTrigger';
 	import Scrollbar from 'smooth-scrollbar';
+	import type { Snippet } from 'svelte';
 
-	let { children } = $props();
+	let { children }: { children: Snippet } = $props();
 
 	let scrollX = $state(0);
 	let scrollY = $state(0);

@@ -3,22 +3,21 @@
 	import { ScrollTrigger } from 'gsap/dist/ScrollTrigger';
 	import * as THREE from 'three';
 	import { Canvas } from '@threlte/core';
-	import { T } from '@threlte/core';
-	import { OrbitControls, SoftShadows } from '@threlte/extras';
+	import { SoftShadows } from '@threlte/extras';
 
 	import Modele from './Modele.svelte';
 	import SpotLight from './utils/Light/SpotLight.svelte';
 	import FlameLight from './utils/Light/FlameLight.svelte';
-	import { updateCamera } from './utils/Functions/cameraUtils';
+	import CameraRig from './CameraRig.svelte';
 
 	import {
 		disableAnimationsHome,
 		desiredTarget,
 		desiredCameraPosition,
-		leftSpotLightIntensity,
-		rightSpotLightIntensity,
 		targetLeftIntensity,
 		targetRightIntensity,
+		leftSpotLightIntensity,
+		rightSpotLightIntensity,
 		devLettersIntensity,
 		musicLettersIntensity,
 		PrincipalLightIntensity,
@@ -27,20 +26,14 @@
 		lerpFactor
 	} from '$store/ThreeStore/animationStores';
 
-	import { startAnimationLoop } from './utils/Functions/animationUtils';
-
 	import {
 		handleMouseEnter,
 		handleMouseMove,
 		handleMouseOut
 	} from './utils/Functions/mouseHandlers';
-	import PointLight from './utils/Light/PointLight.svelte';
 	import LetterLights from './utils/Light/LetterLights.svelte';
 
 	gsap.registerPlugin(ScrollTrigger);
-
-	let PerspectiveCameraRef = $state<THREE.PerspectiveCamera | undefined>(undefined);
-	let OrbitControlsRef = $state<any | undefined>(undefined);
 
 	// Gestion des animations désactivées
 	disableAnimationsHome.subscribe((disable) => {
@@ -55,39 +48,13 @@
 			devLettersIntensity.set(0);
 			musicLettersIntensity.set(0);
 			lerpFactor.set(0.2);
-		} else {
-			console.log('Animations désactivées');
-		}
-	});
-
-	$effect(() => {
-		let cameraSubscriptions: any;
-
-		if (!$disableAnimationsHome) {
-			startAnimationLoop(PerspectiveCameraRef, OrbitControlsRef);
-			if (PerspectiveCameraRef) {
-				cameraSubscriptions = updateCamera(PerspectiveCameraRef, OrbitControlsRef);
-			}
-		} else {
-			cameraSubscriptions?.unsubscribePosition();
-			cameraSubscriptions?.unsubscribeTarget();
 		}
 	});
 </script>
 
-<Canvas shadows>
-	<SoftShadows focus={15} size={15} samples={50} />
-	<T.PerspectiveCamera bind:ref={PerspectiveCameraRef} makeDefault position={[-25, 7, 0]} fov={15}>
-		<OrbitControls
-			bind:ref={OrbitControlsRef}
-			autoRotate={false}
-			enableRotate={true}
-			enableZoom={true}
-			enablePan={true}
-			enableDamping={true}
-			target={[0, 2, 0]}
-		/>
-	</T.PerspectiveCamera>
+<Canvas shadows dpr={Math.min(window.devicePixelRatio, 2)}>
+	<CameraRig />
+	<SoftShadows focus={15} size={15} samples={16} />
 
 	<FlameLight
 		color="#FFA500"

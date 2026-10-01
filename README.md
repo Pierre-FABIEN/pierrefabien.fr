@@ -1,46 +1,41 @@
-# sv
+# pierrefabien.fr
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+Site personnel statique de Pierre Fabien (développeur web & compositeur musical), construit avec [SvelteKit](https://svelte.dev/docs/kit) + Svelte 5 (runes) et une scène 3D interactive [Threlte](https://threlte.xyz)/Three.js animée au scroll (GSAP).
 
-## Creating a project
+## Stack
 
-If you're seeing this, you've probably already done this step. Congrats!
+- **SvelteKit 2 / Svelte 5** — runes (`$state`, `$props`, `$effect`), export statique via `@sveltejs/adapter-static`
+- **Threlte** (`@threlte/core`, `@threlte/extras`) — scène 3D (modèle GLTF/Draco) en fond du layout
+- **GSAP** (`ScrollTrigger`) — animations pilotées par le scroll
+- **Tailwind CSS** + composants `shadcn-svelte`
+- **Vite PWA** — manifeste + service worker
 
-```bash
-# create a new project in the current directory
-npx sv create
-
-# create a new project in my-app
-npx sv create my-app
-```
-
-## Developing
-
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+## Développement
 
 ```bash
+npm install
 npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
 ```
 
-## Building
-
-To create a production version of your app:
+## Build
 
 ```bash
-npm run build
+npm run build   # génère un export statique dans build/
+npm run preview
 ```
 
-You can preview the production build with `npm run preview`.
+## Qualité
 
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+```bash
+npm run check   # svelte-check
+npm run lint    # prettier + eslint
+npm run test    # vitest + playwright
+```
 
-A installer:
-test playwright sur les auth
-mettre une option pour la f2a
+## Pipeline modèles 3D
 
-Ne peut être :
-multiLang
-Pierre-Fabien-Website
+Les fichiers `.glb` dans `static/models` sont transformés en composants Threlte via :
+
+```bash
+npm run model-pipeline:run
+```

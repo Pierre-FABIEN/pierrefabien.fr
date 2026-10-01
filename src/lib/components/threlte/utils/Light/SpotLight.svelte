@@ -4,6 +4,19 @@
 	import { SpotLightHelper, Object3D } from 'three';
 	import type * as THREE from 'three';
 
+	// Déclaration des types pour assurer la sécurité
+	interface Props {
+		helpers?: boolean;
+		intensity?: number;
+		position?: [number, number, number];
+		angle?: number;
+		penumbra?: number;
+		distance?: number;
+		targetRef?: THREE.Object3D | null;
+		targetPosition?: [number, number, number];
+		castShadow?: boolean;
+	}
+
 	// Récupération des props via $props
 	let {
 		helpers = true,
@@ -13,26 +26,15 @@
 		penumbra = 0.5,
 		distance = 20,
 		targetRef = null,
-		targetPosition = [0, 0, 0]
-	} = $props();
-
-	// Déclaration des types pour assurer la sécurité
-	interface Props {
-		helpers: boolean;
-		intensity: number;
-		position: [number, number, number];
-		angle: number;
-		penumbra: number;
-		distance: number;
-		targetRef: THREE.Object3D | null;
-		targetPosition: [number, number, number];
-	}
+		targetPosition = [0, 0, 0],
+		castShadow = true
+	}: Props = $props();
 
 	// Accéder à la scène via Threlte
 	const { scene } = useThrelte();
 
 	// Références pour la lumière et le helper
-	let spotLightRef: THREE.SpotLight;
+	let spotLightRef = $state<THREE.SpotLight>()!;
 	let spotLightHelper: SpotLightHelper | null = null;
 	const defaultTargetRef = new Object3D();
 
@@ -91,14 +93,13 @@
 	});
 </script>
 
-
 <!-- SpotLight avec helper optionnel -->
 <T.SpotLight
 	bind:ref={spotLightRef}
 	color="#FFFFFF"
 	{intensity}
 	{position}
-	castShadow
+	{castShadow}
 	{angle}
 	{penumbra}
 	{distance}

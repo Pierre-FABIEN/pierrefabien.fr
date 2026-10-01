@@ -11,20 +11,28 @@
 		setRessourceToValide
 	} from '$lib/store/initialLoaderStore';
 	import Loader from '$lib/components/loader/Loader.svelte';
-	import { page } from '$app/stores';
-	import Scene from '$lib/components/threlte/Scene.svelte';
+	import { page } from '$app/state';
+	import type { Component } from 'svelte';
 
 	let { children } = $props();
 
+	// Chargée dynamiquement après le montage pour ne pas inclure Three.js/Threlte/GSAP
+	// dans le bundle JS initial (retarderait le Time To Interactive).
+	let Scene: Component | undefined = $state();
+
 	$effect(() => {
-		const unsubscribe = page.subscribe((currentPage) => {
-			initializeLayoutState(currentPage);
-		});
+		initializeLayoutState(page);
 		setupNavigationEffect();
 		setFirstOpen(true);
 		setRessourceToValide(true);
+	});
 
-		return unsubscribe;
+	$effect(() => {
+		if ($isClient && !Scene) {
+			import('$lib/components/threlte/Scene.svelte').then((module) => {
+				Scene = module.default;
+			});
+		}
 	});
 </script>
 
@@ -40,7 +48,9 @@
 {/if}
 {#if $isClient}
 	<div class="threlte">
-		<Scene />
+		{#if Scene}
+			<Scene />
+		{/if}
 	</div>
 	<ModeWatcher />
 	<div class="container">

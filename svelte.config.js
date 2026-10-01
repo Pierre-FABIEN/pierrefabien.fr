@@ -1,4 +1,4 @@
-import vercel from '@sveltejs/adapter-vercel';
+import adapter from '@sveltejs/adapter-static';
 import { VitePWA } from 'vite-plugin-pwa';
 import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
 
@@ -35,11 +35,16 @@ const config = {
 		})
 	],
 	kit: {
-		// adapter-auto only supports some environments, see https://svelte.dev/docs/kit/adapter-auto for a list.
-		// If your environment is not supported, or you settled on a specific environment, switch out the adapter.
-		// See https://svelte.dev/docs/kit/adapters for more information about adapters.
-		adapter: vercel(),
-		
+		// Site 100% statique : pas de code serveur, export HTML/CSS/JS pur.
+		// https://svelte.dev/docs/kit/adapter-static
+		adapter: adapter({
+			pages: 'build',
+			assets: 'build',
+			fallback: undefined,
+			precompress: false,
+			strict: true
+		}),
+
 		alias: {
 			// this will match a file
 			$lib: 'src/lib',
