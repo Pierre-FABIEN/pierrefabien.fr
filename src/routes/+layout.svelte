@@ -11,6 +11,7 @@
 		setRessourceToValide
 	} from '$lib/store/initialLoaderStore';
 	import Loader from '$lib/components/loader/Loader.svelte';
+	import SiteNav from '$lib/components/SiteNav.svelte';
 	import { page } from '$app/state';
 	import type { Component } from 'svelte';
 
@@ -64,6 +65,7 @@
 		{/if}
 	</div>
 	<ModeWatcher />
+	<SiteNav />
 	<div class="container">
 		<SmoothScrollBar>
 			<main>

@@ -1,0 +1,70 @@
+<script lang="ts">
+	import { page } from '$app/state';
+
+	const links = [
+		{ href: '/', label: 'Accueil' },
+		{ href: '/dev', label: 'Dev' },
+		{ href: '/music', label: 'Music' }
+	];
+
+	function isActive(href: string) {
+		return href === '/' ? page.url.pathname === '/' : page.url.pathname.startsWith(href);
+	}
+</script>
+
+<nav class="site-nav" aria-label="Navigation principale">
+	<ul>
+		{#each links as link (link.href)}
+			<li>
+				<a href={link.href} aria-current={isActive(link.href) ? 'page' : undefined}>
+					{link.label}
+				</a>
+			</li>
+		{/each}
+	</ul>
+</nav>
+
+<style>
+	.site-nav {
+		position: fixed;
+		top: 0;
+		left: 0;
+		z-index: 50;
+		width: 100%;
+		display: flex;
+		justify-content: center;
+		padding: 1rem;
+		pointer-events: none;
+	}
+
+	ul {
+		display: flex;
+		gap: 1.5rem;
+		list-style: none;
+		margin: 0;
+		padding: 0.5rem 1.25rem;
+		border: 1px solid rgb(255 255 255 / 0.2);
+		border-radius: 9999px;
+		background: rgb(0 0 0 / 0.6);
+		backdrop-filter: blur(8px);
+		pointer-events: auto;
+	}
+
+	a {
+		font-size: 0.875rem;
+		font-weight: 600;
+		letter-spacing: 0.02em;
+		text-transform: uppercase;
+		color: rgb(255 255 255 / 0.7);
+		text-decoration: none;
+		transition: color 0.2s ease;
+	}
+
+	a:hover {
+		color: hsl(var(--primary));
+	}
+
+	a[aria-current='page'] {
+		color: hsl(var(--primary));
+	}
+</style>
