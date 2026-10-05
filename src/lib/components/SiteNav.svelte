@@ -1,14 +1,31 @@
 <script lang="ts">
 	import { page } from '$app/state';
+	import { goto } from '$app/navigation';
+	import type { Section } from '$lib/components/threlte/utils/Functions/sectionTransition';
 
-	const links = [
-		{ href: '/', label: 'Accueil' },
-		{ href: '/dev', label: 'Dev' },
-		{ href: '/music', label: 'Music' }
+	const links: { href: string; label: string; section: Section }[] = [
+		{ href: '/', label: 'Accueil', section: 'home' },
+		{ href: '/dev', label: 'Dev', section: 'dev' },
+		{ href: '/music', label: 'Music', section: 'music' }
 	];
 
 	function isActive(href: string) {
 		return href === '/' ? page.url.pathname === '/' : page.url.pathname.startsWith(href);
+	}
+
+	// Même rotation de caméra que les hotspots de la home (import dynamique : sectionTransition
+	// tire gsap/three, à garder hors du bundle eager de +layout.svelte).
+	async function handleClick(event: MouseEvent, href: string, section: Section) {
+		if (isActive(href)) return;
+		event.preventDefault();
+		if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+			goto(href);
+			return;
+		}
+		const { navigateToSection } = await import(
+			'$lib/components/threlte/utils/Functions/sectionTransition'
+		);
+		await navigateToSection(section, href);
 	}
 </script>
 
@@ -16,7 +33,11 @@
 	<ul>
 		{#each links as link (link.href)}
 			<li>
-				<a href={link.href} aria-current={isActive(link.href) ? 'page' : undefined}>
+				<a
+					href={link.href}
+					aria-current={isActive(link.href) ? 'page' : undefined}
+					onclick={(e) => handleClick(e, link.href, link.section)}
+				>
 					{link.label}
 				</a>
 			</li>
@@ -66,5 +87,17 @@
 
 	a[aria-current='page'] {
 		color: hsl(var(--primary));
+	}
+
+	a:focus-visible {
+		outline: 2px solid hsl(var(--primary));
+		outline-offset: 4px;
+		border-radius: 2px;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		a {
+			transition: none;
+		}
 	}
 </style>
