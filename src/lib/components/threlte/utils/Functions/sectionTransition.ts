@@ -43,16 +43,36 @@ export function animateCameraToSection(section: Section): Promise<void> {
 
 // Même rotation de caméra que les hotspots de la home, mais réutilisable depuis
 // n'importe quelle route (ex: nav persistante) pour naviguer entre home/dev/music.
+let navigationInProgress = false;
+
 export async function navigateToSection(section: Section, href: string): Promise<void> {
-	// Affiche le placeholder de la section cible avant la rotation pour éviter tout pop-in ;
-	// pour "home", le changement de route déclenchera lui-même l'effet de Scene.svelte.
-	if (section !== 'home') {
-		activeSection.set(section);
+	if (navigationInProgress) return;
+	navigationInProgress = true;
+	const content = document.querySelector<HTMLElement>('[data-route-content]');
+	try {
+		if (content && get(activeSection) !== 'home') {
+			await new Promise<void>((resolve) => {
+				gsap.to(content, {
+					opacity: 0,
+					duration: 0.3,
+					ease: 'power2.out',
+					onComplete: resolve
+				});
+			});
+		}
+		if (section !== 'home') {
+			activeSection.set(section);
+		} else {
+			homeSceneVisible.set(true);
+		}
+		await animateCameraToSection(section);
+		homeSceneVisible.set(section === 'home');
+		if (section === 'home') {
+			activeSection.set('home');
+		}
+		await goto(href);
+	} finally {
+		if (content) gsap.set(content, { clearProps: 'opacity' });
+		navigationInProgress = false;
 	}
-	await animateCameraToSection(section);
-	homeSceneVisible.set(section === 'home');
-	if (section === 'home') {
-		activeSection.set('home');
-	}
-	goto(href);
 }

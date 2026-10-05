@@ -68,7 +68,7 @@
 	<SiteNav />
 	<div class="container">
 		<SmoothScrollBar>
-			<main>
+			<main data-route-content>
 				{@render children()}
 			</main>
 		</SmoothScrollBar>
