@@ -10,6 +10,7 @@
 	import SpotLight from './utils/Light/SpotLight.svelte';
 	import FlameLight from './utils/Light/FlameLight.svelte';
 	import CameraRig from './CameraRig.svelte';
+	import DeviceTilt from './DeviceTilt.svelte';
 
 	import {
 		disableAnimationsHome,
@@ -145,6 +146,8 @@
 		musicLettersIntensity={$musicLettersIntensity}
 	/>
 </Canvas>
+
+<DeviceTilt />
 
 <svelte:window
 	on:mousemove={handleMouseMove}
