@@ -3,6 +3,7 @@
 // pour obtenir une pure rotation vers le haut (pas de déplacement). La
 // résolution de la Promise permet d'attendre la fin avant d'appeler goto().
 import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/dist/ScrollTrigger';
 import * as THREE from 'three';
 import { get } from 'svelte/store';
 import { tick } from 'svelte';
@@ -51,6 +52,8 @@ export async function navigateToSection(section: Section, href: string): Promise
 	if (navigationInProgress) return;
 	navigationInProgress = true;
 	const content = document.querySelector<HTMLElement>('[data-route-content]');
+	const homeSnap = ScrollTrigger.getById('home-section-snap');
+	homeSnap?.disable(false);
 	try {
 		if (get(activeSection) === 'home') {
 			const { smoothScroll } = get(SmoothScrollBarStore);
@@ -85,6 +88,7 @@ export async function navigateToSection(section: Section, href: string): Promise
 		await goto(href);
 	} finally {
 		if (content) gsap.set(content, { clearProps: 'opacity' });
+		if (get(activeSection) === 'home') homeSnap?.enable(false, false);
 		navigationInProgress = false;
 	}
 }

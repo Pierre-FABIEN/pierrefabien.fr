@@ -60,7 +60,7 @@
 	<p class="text-center container-text-about">
 		Hello ! welcome to my website.
 		<br />
-		I'm a web developer and musical composer from Toulouse,<br /> passionate about both art and science.
+		I'm a web developer and musical composer from Toulouse,<br /> passionate about both art and technologies.
 	</p>
 </section>
 <section class="suite flex justify-center content-center items-center">

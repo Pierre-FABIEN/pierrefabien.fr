@@ -1,0 +1,329 @@
+.home {
+	@include ccc;
+	width: 100%;
+	min-height: 100%;
+	position: absolute;
+	padding-bottom: 150px;
+
+	.home-visage {
+		position: absolute;
+		top: 0;
+		right: 0;
+		height: 100vh;
+	}
+
+	.logo-container {
+		@include ccc;
+		height: 100vh;
+
+		.logo5degres {
+			position: absolute;
+			height: 80vh !important;
+			transform: rotate(20deg) translate(-400px, 150px);
+			opacity: 0.3;
+			fill: white;
+		}
+
+		.visage {
+			position: absolute;
+			height: 80vh !important;
+			right: 0;
+			pointer-events: none;
+		}
+
+		@keyframes portfolio-spin {
+			from {
+				transform: translate(-50%, -50%) rotate(0deg);
+			}
+			to {
+				transform: translate(-50%, -50%) rotate(360deg);
+			}
+		}
+
+		@keyframes portfolio-arrow {
+			0% {
+				transform: translate(0%, -20%);
+			}
+			50% {
+				transform: translate(0%, 20%);
+			}
+			100% {
+				transform: translate(0%, -20%);
+			}
+		}
+
+		.button-circle {
+			position: relative;
+			right: 0;
+			width: 200px;
+			height: 200px;
+
+			transform: translateX(0%) translateY(0%) scale(1);
+			background: none;
+			border: none;
+			outline: none;
+			transition: all 0.5s ease;
+
+			&:hover {
+				cursor: pointer;
+				transform: translateX(0%) translateY(0%) scale(1.5);
+			}
+
+			@include breakpointMin(tablet_portrait_max) {
+				transform: translateX(100%) translateY(-10%) scale(1);
+
+				&:hover {
+					cursor: pointer;
+
+					transform: translateX(100%) translateY(-10%) scale(1.5);
+				}
+			}
+
+			svg {
+				height: 50%;
+				width: 200px;
+				animation: portfolio-arrow 1.5s linear infinite;
+			}
+
+			.circle-container {
+				position: absolute;
+				width: 200px;
+				height: 200px;
+				top: 50%;
+				left: 50%;
+				transform: translate(50%, -50%);
+
+				animation: portfolio-spin 20s linear infinite;
+
+				.circle-text {
+					position: absolute;
+					width: 100%;
+					height: 100%;
+					border-radius: 50%;
+
+					span {
+						position: absolute;
+						font-size: 18px;
+						transform-origin: 0 100px; /* Radius of the circle */
+						font-family: Open Sans;
+						text-transform: uppercase;
+					}
+				}
+
+				.circle-text .circle-text span:nth-child(1) {
+					transform: rotate(0deg);
+				}
+				.circle-text span:nth-child(2) {
+					transform: rotate(10deg);
+				}
+				.circle-text span:nth-child(3) {
+					transform: rotate(20deg);
+				}
+				.circle-text span:nth-child(4) {
+					transform: rotate(30deg);
+				}
+				.circle-text span:nth-child(5) {
+					transform: rotate(40deg);
+				}
+				.circle-text span:nth-child(6) {
+					transform: rotate(50deg);
+				}
+				.circle-text span:nth-child(7) {
+					transform: rotate(60deg);
+				}
+				.circle-text span:nth-child(8) {
+					transform: rotate(70deg);
+				}
+				.circle-text span:nth-child(9) {
+					transform: rotate(80deg);
+				}
+				.circle-text span:nth-child(10) {
+					transform: rotate(90deg);
+				}
+				.circle-text span:nth-child(11) {
+					transform: rotate(100deg);
+				}
+				.circle-text span:nth-child(12) {
+					transform: rotate(110deg);
+				}
+				.circle-text span:nth-child(13) {
+					transform: rotate(120deg);
+				}
+				.circle-text span:nth-child(14) {
+					transform: rotate(130deg);
+				}
+				.circle-text span:nth-child(15) {
+					transform: rotate(140deg);
+				}
+				.circle-text span:nth-child(16) {
+					transform: rotate(150deg);
+				}
+				.circle-text span:nth-child(17) {
+					transform: rotate(160deg);
+				}
+				.circle-text span:nth-child(18) {
+					transform: rotate(170deg);
+				}
+				.circle-text span:nth-child(19) {
+					transform: rotate(180deg);
+				}
+				.circle-text span:nth-child(20) {
+					transform: rotate(190deg);
+				}
+				.circle-text span:nth-child(21) {
+					transform: rotate(200deg);
+				}
+				.circle-text span:nth-child(22) {
+					transform: rotate(210deg);
+				}
+				.circle-text span:nth-child(23) {
+					transform: rotate(220deg);
+				}
+				.circle-text span:nth-child(24) {
+					transform: rotate(230deg);
+				}
+				.circle-text span:nth-child(25) {
+					transform: rotate(240deg);
+				}
+				.circle-text span:nth-child(26) {
+					transform: rotate(250deg);
+				}
+				.circle-text span:nth-child(27) {
+					transform: rotate(260deg);
+				}
+				.circle-text span:nth-child(28) {
+					transform: rotate(270deg);
+				}
+				.circle-text span:nth-child(29) {
+					transform: rotate(280deg);
+				}
+				.circle-text span:nth-child(30) {
+					transform: rotate(290deg);
+				}
+				.circle-text span:nth-child(31) {
+					transform: rotate(300deg);
+				}
+				.circle-text span:nth-child(32) {
+					transform: rotate(310deg);
+				}
+				.circle-text span:nth-child(33) {
+					transform: rotate(320deg);
+				}
+				.circle-text span:nth-child(34) {
+					transform: rotate(330deg);
+				}
+				.circle-text span:nth-child(35) {
+					transform: rotate(340deg);
+				}
+				.circle-text span:nth-child(36) {
+					transform: rotate(350deg);
+				}
+				.circle-text span:nth-child(37) {
+					transform: rotate(360deg);
+				}
+			}
+		}
+
+		.branding {
+			z-index: 10;
+			font-family: Open Sans;
+
+			span {
+				text-align: center;
+				width: fit-content;
+
+				&:nth-of-type(1) {
+					font-weight: 900;
+					font-size: 90px;
+
+					span {
+						font-weight: 200;
+						color: $color-text;
+					}
+				}
+
+				&:nth-of-type(2) {
+					text-transform: uppercase;
+					font-weight: 900;
+					font-size: 61px;
+				}
+
+				&:nth-of-type(3) {
+					text-transform: uppercase;
+					font-weight: 900;
+					font-size: 56px;
+				}
+			}
+		}
+
+		ul {
+			display: flex;
+			@include rcs;
+			width: 100%;
+
+			li {
+				width: 30px;
+				height: 30px;
+				position: relative;
+				margin: 10px;
+				transition: all 0.5s ease;
+
+				img {
+					width: 30px;
+					height: 30px;
+				}
+
+				a {
+					position: absolute;
+					top: 0;
+					left: 0;
+					width: 30px;
+					height: 30px;
+					font-size: 0;
+
+					opacity: 0;
+				}
+
+				span {
+					font-family: 'Open sans';
+					font-weight: 400;
+					transition: all 0.25s ease;
+					position: absolute;
+					top: 0;
+					left: 0;
+					transform: translateY(20px);
+					opacity: 0;
+				}
+
+				&:hover {
+					transform: scale(1.5);
+					span {
+						transform: translateY(40px);
+						opacity: 1;
+					}
+				}
+			}
+		}
+
+		@media (max-width: 800px) {
+			.branding {
+				span {
+					&:nth-of-type(1) {
+						font-size: 11vw !important;
+						line-height: 11vw !important;
+					}
+
+					&:nth-of-type(2) {
+						font-size: 7.5vw !important;
+						line-height: 7.5vw !important;
+					}
+
+					&:nth-of-type(3) {
+						font-size: 6.9vw;
+						line-height: 6.9vw;
+					}
+				}
+			}
+		}
+	}
+}

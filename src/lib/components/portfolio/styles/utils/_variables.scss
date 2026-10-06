@@ -1,0 +1,21 @@
+$color-black: #000;
+$color-white: #fff;
+$whiteBackground: rgb(244, 244, 244);
+$font-neue-haas-grotesk-regular: 'Neue Haas Grotesk Regular', sans-serif;
+$color-text: #1966cb;
+$dark-text: #2672d5;
+$dark-blue: #04030a;
+$titleColor: #7fd80a;
+$titleColor2: #59950a;
+$boxDarkBlue: #001133;
+$boxDarkBlue2: #093168;
+
+$shadowBlue: rgba(38, 114, 213, 0.3);
+$shadowDarkBlue: rgba(78, 195, 224, 0.22);
+$shadowBox1:
+	0 0px 38px rgb(38 114 213 / 30%),
+	0 15px 12px rgb(78 195 224 / 22%);
+$ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);
+$footerGradient: linear-gradient(236deg, rgba(85, 185, 236, 1) 0%, rgba(38, 114, 213, 1) 100%);
+
+$z-indexes: ('noscript', 'preloader', 'navigation', 'content', 'canvas');

@@ -4,6 +4,8 @@
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/dist/ScrollTrigger';
 import * as THREE from 'three';
+import { get } from 'svelte/store';
+import SmoothScrollBarStore from '$lib/store/SmoothScrollBarStore';
 import {
 	disableAnimationsHome,
 	cameraPosition,
@@ -18,6 +20,28 @@ export function initScrollAnimations(): () => void {
 	const cameraPos = { x: -25, y: 7, z: 0 };
 	const cameraTgt = { x: 0, y: 2, z: 0 };
 	const pointLight = { value: 0 };
+	const sections = gsap.utils.toArray<HTMLElement>('[data-route-content] > section');
+	const snapTrigger =
+		sections.length > 1 && !window.matchMedia('(prefers-reduced-motion: reduce)').matches
+			? ScrollTrigger.create({
+					id: 'home-section-snap',
+					trigger: sections[0].parentElement,
+					start: 'top top',
+					end: 'bottom bottom',
+					snap: {
+						snapTo: 1 / (sections.length - 1),
+						directional: true,
+						inertia: false,
+						delay: 0.2,
+						duration: { min: 0.25, max: 0.6 },
+						ease: 'power2.inOut',
+						onStart: () => {
+							const { smoothScroll } = get(SmoothScrollBarStore);
+							smoothScroll?.setMomentum(0, 0);
+						}
+					}
+				})
+			: undefined;
 
 	// ScrollTrigger pour désactiver les animations liées à la souris
 	const scrollTrigger1 = ScrollTrigger.create({
@@ -115,6 +139,7 @@ export function initScrollAnimations(): () => void {
 	});
 
 	return () => {
+		snapTrigger?.kill();
 		scrollTrigger1.kill();
 		scrollTrigger2.kill();
 		scrollTrigger3.kill();

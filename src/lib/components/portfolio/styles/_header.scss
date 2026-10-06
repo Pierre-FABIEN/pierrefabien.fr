@@ -1,0 +1,112 @@
+header {
+	@include ccc;
+	position: absolute;
+	z-index: 100;
+	width: 100%;
+	overflow: hidden;
+	bottom: 0;
+	padding-bottom: 30px;
+
+	.left-side {
+		@include rcc;
+		position: absolute !important;
+		right: 30px !important;
+		bottom: 10px;
+	}
+
+	.menu-container {
+		width: 100%;
+		@include ccs;
+		height: 100%;
+		opacity: 0;
+		visibility: hidden;
+		display: none;
+	}
+
+	.header-container {
+		@include rcb;
+		width: calc(100% - 60px);
+		max-width: 1400px;
+		padding: 10px;
+		height: 60px;
+		margin-top: 30px;
+
+		backdrop-filter: blur(10px);
+		border-radius: 30px;
+
+		box-shadow: -1px 3px 12px -2px rgba(0, 0, 0, 0.2);
+		-webkit-box-shadow: -1px 3px 12px -2px rgba(0, 0, 0, 0.2);
+		-moz-box-shadow: -1px 3px 12px -2px rgba(0, 0, 0, 0.2);
+
+		.cross-first {
+			transition: all 0.25s ease;
+			position: absolute;
+			transform-origin: center;
+			bottom: 10px;
+		}
+
+		.linkMenu {
+			@include ccc;
+			transition: all 0.3s ease;
+			position: absolute !important;
+			left: 50% !important;
+			right: 50% !important;
+			bottom: 12px;
+			transform: rotate(180deg) !important;
+
+			svg {
+				width: 30px;
+				height: auto;
+
+				polyline {
+					stroke: $color-text;
+				}
+			}
+
+			&.active {
+				transform: scale(2.5) translate(50%, -10px) !important;
+
+				polyline.cross-first {
+					transform: rotateX(-180deg) translateY(-37px) !important;
+					transform-origin: center !important;
+				}
+			}
+
+			&.inactive {
+				transform: scale(1) translate(50%, 0px);
+
+				polyline.cross-first {
+					transform: rotateX(0deg) translateY(0px) !important;
+					transform-origin: center !important;
+				}
+			}
+
+			&:hover {
+				cursor: pointer;
+			}
+		}
+
+		.header-branding {
+			margin: 0;
+			font-weight: 900;
+			position: absolute !important;
+			left: 30px !important;
+			font-size: 25px;
+			bottom: 10px;
+
+			b {
+				color: $color-text;
+				font-weight: 200;
+			}
+
+			@media (max-width: 420px) {
+				display: none;
+			}
+		}
+	}
+
+	ul {
+		width: 500px;
+		@include rcb;
+	}
+}

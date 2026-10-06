@@ -1,0 +1,69 @@
+@import './utils/variables';
+@import './utils/functions';
+@import './utils/breackpoints';
+@import './utils/flex';
+@import './utils/mixins';
+@import './utils/vendors';
+@import './BorderAnimation';
+@import './base/opensans/open-sans';
+
+.portfolio-root {
+	font-family: 'Lato', sans-serif;
+	line-height: 1.15;
+	image-rendering: smooth;
+
+	// normalize.css de la référence (h1 et contrôles), absent du preflight Tailwind.
+	h1,
+	h2,
+	h3,
+	h4,
+	h5,
+	h6 {
+		font-size: 100%;
+		font-weight: normal;
+	}
+
+	h1 {
+		font-size: 2em;
+		margin: 0.67em 0;
+	}
+
+	// Le preflight Tailwind passe svg/img en block, la référence les laisse inline.
+	svg,
+	img {
+		display: inline;
+		vertical-align: baseline;
+	}
+
+	button {
+		font-family: inherit;
+		font-size: 100%;
+		line-height: 1.15;
+		margin: 0;
+		padding: 1px 6px;
+		text-transform: none;
+	}
+
+	@import './darkMode';
+	@import './header';
+	@import './items';
+	@import './home';
+	@import './grids';
+	@import './lines';
+	@import './main';
+
+	.home {
+		position: relative;
+		min-height: 100vh;
+	}
+
+	header {
+		position: fixed;
+		left: 0;
+		pointer-events: none;
+
+		.header-container {
+			pointer-events: auto;
+		}
+	}
+}

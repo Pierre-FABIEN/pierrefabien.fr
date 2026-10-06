@@ -1,0 +1,67 @@
+.containerLines {
+	width: 100vw;
+	height: 160vh;
+	position: absolute;
+	overflow: hidden;
+	z-index: 0;
+	pointer-events: none;
+	top: 150vh;
+
+	.background {
+		position: absolute;
+		width: 250%;
+		height: 200%;
+		transform: rotate(-15deg) translate(-150px, -33%);
+		opacity: 0.5;
+		display: flex;
+		flex-direction: column;
+		flex-wrap: wrap;
+		justify-content: center;
+		align-content: stretch;
+		align-items: center;
+		z-index: 0;
+		overflow: hidden;
+
+		@media screen and (max-width: 650px) {
+			display: none;
+		}
+
+		.line {
+			background-image: url('/portfolio/background.svg');
+			width: 1000%;
+			height: 180px;
+			transition: all 2s ease-out;
+			will-change: transform;
+			background-size: 560px auto;
+
+			--after: 0px;
+			--before: 0px;
+
+			background-repeat: repeat-x;
+
+			&:after {
+				content: ' ';
+				background-image: url('/portfolio/background.svg');
+				transform: translateY(60px) translateX(var(--after));
+				width: 1000%;
+				height: 60px;
+				transition: all 2s ease-out;
+				will-change: transform;
+				position: absolute;
+				background-repeat: repeat-x;
+			}
+
+			&:before {
+				content: ' ';
+				background-image: url('/portfolio/background.svg');
+				transform: translateY(120px) translateX(var(--before));
+				width: 1000%;
+				height: 60px;
+				transition: all 2s ease-out;
+				will-change: transform;
+				position: absolute;
+				background-repeat: repeat-x;
+			}
+		}
+	}
+}

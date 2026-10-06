@@ -1,0 +1,102 @@
+.title,
+.subtitle,
+.title-bold {
+	margin-right: auto;
+	margin-left: auto;
+	font-weight: 400;
+	letter-spacing: 0;
+	color: $color-text;
+}
+
+.title {
+	margin-top: 70px;
+	margin-bottom: 15px;
+	font-size: 75px;
+	text-align: justify;
+	width: 1300px;
+}
+
+.subtitle {
+	width: 1300px;
+	font-size: 35px;
+	color: $titleColor;
+	font-weight: 500;
+}
+
+.handleClass {
+	outline: none;
+	border: none;
+	background: transparent;
+	cursor: pointer;
+
+	&:focus-visible {
+		outline: 2px solid $color-text;
+		outline-offset: 4px;
+	}
+}
+
+.portfolio-second {
+	.a {
+		@include ccc;
+
+		h2 {
+			font-size: 100px;
+			text-align: center;
+			font-weight: 100;
+			margin: 0;
+			color: $titleColor !important;
+			text-transform: uppercase;
+		}
+	}
+
+	.b {
+		h2 {
+			font-size: 40px;
+			margin-top: 0;
+		}
+	}
+
+	.c {
+		h2 {
+			font-size: 40px;
+		}
+
+		p {
+			margin-bottom: 15px;
+		}
+	}
+
+	article {
+		&:hover {
+			background-color: $whiteBackground;
+		}
+	}
+}
+
+.portfolio-fifth {
+	width: 100%;
+	h3 {
+		font-size: 60px;
+	}
+}
+
+.portfolio-fourth {
+	h2 {
+		font-size: 60px;
+	}
+}
+
+.title.axo {
+	text-align: center;
+
+	span {
+		color: $titleColor;
+	}
+}
+
+.lighthouse {
+	max-width: 800px;
+	width: 80vw;
+	margin-bottom: 50px;
+	margin-top: 50px;
+}

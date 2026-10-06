@@ -1,0 +1,120 @@
+& {
+	--bg-color: #{$dark-blue};
+	--text-color: #eeeeee;
+	--box-color: invert(1);
+	--invert-color: #d98d2a;
+	--invertdark-color: #1a0042;
+	--invertlight: #fffaec;
+	--shadow: 0 0px 38px rgba(217, 141, 42, 0.3), 0 15px 12px rgba(177, 60, 31, 0.22);
+	--header-gradient1: linear-gradient(to left, rgba(27, 27, 27, 0.75), rgba(0, 0, 0, 0.75));
+	--backgroundGradient: linear-gradient(30deg, #000000 0%, #070511 100%);
+	--opacityImg: 0.025;
+	--dropShadow: drop-shadow(0 0 0.75rem rgb(0, 0, 0));
+	--opacityVisage: 0.15;
+}
+
+// body {
+//   background-color: var(--bg-color);
+//   color: var(--text-color);
+// }
+
+.header-container {
+	background: var(--header-gradient1) !important;
+	border-image: linear-gradient(to right, rgb(255, 255, 255), rgb(248, 248, 248));
+}
+
+.lighthouse {
+	filter: var(--box-color);
+}
+
+.logo-container {
+	ul {
+		path {
+			filter: var(--box-color);
+		}
+	}
+}
+
+.header-branding {
+	color: var(--text-color);
+}
+
+.visage {
+	filter: var(--box-color);
+	opacity: var(--opacityVisage);
+}
+
+.home {
+	.branding {
+		span {
+			color: var(--text-color);
+			transition: color 0.25s ease;
+
+			&:nth-of-type(1) {
+				font-weight: 900;
+				font-size: 90px;
+
+				b {
+					font-weight: 200;
+					color: $color-text;
+				}
+			}
+
+			&:nth-of-type(2) {
+				text-transform: uppercase;
+				font-weight: 900;
+				font-size: 61px;
+			}
+
+			&:nth-of-type(3) {
+				text-transform: uppercase;
+				font-weight: 900;
+				font-size: 47px;
+			}
+		}
+
+		svg {
+			path {
+				fill: var(--bg-color);
+			}
+		}
+	}
+
+	article {
+		background: var(--backgroundGradient);
+
+		&:hover {
+			background-color: var(--invertdark-color);
+			img {
+				opacity: var(--opacityImg);
+			}
+		}
+	}
+
+	.button-circle {
+		color: var(--text-color);
+		svg {
+			path {
+				stroke: var(--text-color);
+			}
+		}
+	}
+}
+
+.itemsContainer {
+	.background-overlay {
+		background: var(--backgroundGradient);
+	}
+
+	.textWrapper {
+		h1 {
+			span {
+				color: var(--text-color);
+			}
+		}
+
+		.number {
+			color: var(--text-color);
+		}
+	}
+}

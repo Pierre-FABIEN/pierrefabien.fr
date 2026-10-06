@@ -1,0 +1,648 @@
+$grid-gap: 30px;
+$mobile-width: 850px;
+$tablet-width: 1000px;
+$desktop-width: 1350px;
+$portfolio-max-width: 1300px;
+$portfolio-margin-vertical: 15px;
+
+$a-height-mobile: 200px;
+
+// Mixin for defining a grid layout
+@mixin gridLayout($columns, $rows, $areas) {
+	display: grid;
+	grid-template-columns: $columns;
+	grid-template-rows: $rows;
+	gap: $grid-gap;
+	grid-template-areas: $areas;
+}
+
+// Mixin for basic portfolio item styles
+@mixin portfolioItem {
+	width: 100%;
+	height: 100%;
+	font-family: 'Open Sans';
+}
+
+// Common media query adjustments
+@mixin responsivePortfolio {
+	@media (max-width: $desktop-width) {
+		width: 80vw;
+		height: auto;
+	}
+
+	@media (max-width: $mobile-width) {
+		//h4 { display: none; }
+		article {
+			height: 12vh;
+		}
+	}
+
+	@media (max-width: 500px) {
+		article {
+			height: 60px;
+		}
+
+		h2 {
+			font-size: 30px !important;
+			margin-top: 0 !important;
+		}
+	}
+}
+
+@media (max-width: 800px) {
+	.title {
+		width: 80vw !important;
+		font-size: 11vw !important;
+	}
+}
+
+@media (max-width: 1350px) {
+	.portfolio {
+		width: 80vw !important;
+	}
+
+	.title {
+		width: 80vw !important;
+	}
+
+	.portfolio-square-container {
+		width: 100%;
+	}
+
+	.subtitle {
+		width: 80vw !important;
+	}
+}
+
+// Refactoring articles as a mixin due to repeated use
+@mixin article-style {
+	height: fit-content;
+	align-content: flex-start;
+	border: 1px solid $color-text;
+	padding: 20px;
+	width: 100%;
+	height: 100%;
+	transition:
+		background-color ease 1s,
+		box-shadow ease 1s;
+	position: relative;
+	overflow: hidden;
+
+	h2,
+	h3,
+	h4,
+	p {
+		margin-left: auto;
+		margin-right: auto;
+		color: $color-text;
+		transition: all 1s ease;
+	}
+
+	h2 {
+		margin-top: 40px;
+		margin-bottom: 40px;
+		font-weight: 900;
+		font-size: 35px;
+		color: $dark-text;
+	}
+
+	h3 {
+		margin-top: 40px;
+		margin-bottom: 40px;
+		font-weight: normal;
+		font-size: 16px;
+		line-height: 26px;
+		text-align: left;
+	}
+
+	h4,
+	p {
+		margin: 0;
+		font-size: 16px;
+		line-height: 26px;
+	}
+
+	img {
+		width: 100%;
+		height: 100%;
+		position: absolute;
+		top: 0;
+		left: 0;
+		object-fit: cover;
+		pointer-events: none;
+		opacity: 0.05;
+		transition: opacity 0.2s ease;
+	}
+
+	&:hover {
+		box-shadow: $shadowBox1;
+
+		img {
+			opacity: 0.1;
+		}
+
+		h2 {
+			transform: translateX(10px);
+		}
+	}
+}
+
+article {
+	@include article-style;
+}
+
+// Portfolio sections
+.portfolio-menu,
+.portfolio-second,
+.portfolio-square,
+.portfolio-fourth,
+.portfolio-fifth,
+.portfolio-sixth,
+.portfolio-footer {
+	max-width: $portfolio-max-width;
+	margin: $portfolio-margin-vertical 0;
+	@include responsivePortfolio; // Apply common responsive styles
+}
+
+.portfolio-menu {
+	display: grid;
+	margin: 15px 0;
+	height: 500px;
+	margin-bottom: 100px;
+
+	article {
+		h2 {
+			@include rts;
+			width: 90%;
+			color: $color-text;
+			font-size: 50px;
+			margin: 0;
+			margin-left: auto;
+			margin-right: auto;
+			font-weight: 500;
+			margin-top: 20px;
+
+			transition: all 0.5s ease;
+
+			.portfolio-menu-c {
+				color: $titleColor;
+			}
+
+			.portfolio-menu-next {
+				color: $color-text;
+				transition: all 0.5s ease;
+			}
+		}
+
+		h4,
+		p {
+			color: $color-text;
+			width: 90%;
+			margin-left: auto;
+			margin-right: auto;
+			font-weight: normal;
+			font-size: 16px;
+			line-height: 26px;
+			text-align: left;
+			transition: all 1s ease;
+
+			margin-top: 20px;
+			margin-bottom: 20px;
+		}
+
+		&:hover {
+			cursor: pointer;
+			background-color: $color-text;
+			box-shadow: $shadowBox1;
+
+			h4,
+			p {
+				color: white;
+			}
+
+			h2 {
+				color: white;
+			}
+
+			.portfolio-menu-next {
+				color: #54bbff;
+			}
+		}
+	}
+
+	@include gridLayout(1fr repeat(8, 1fr), 1fr 1fr, 'a a a b b b c c c' 'a a a d d d e e e');
+
+	.a {
+		grid-area: a;
+	}
+
+	.b {
+		grid-area: b;
+	}
+
+	.c {
+		grid-area: c;
+	}
+
+	.d {
+		grid-area: d;
+	}
+
+	.e {
+		grid-area: e;
+	}
+
+	article:last-of-type {
+		border-bottom-right-radius: 50px;
+	}
+
+	@media (max-width: $desktop-width) {
+		width: 80vw;
+		height: auto;
+		@include gridLayout(1fr 1fr, 1fr 1fr 1fr, 'a b' 'a c' 'd e');
+	}
+
+	@media (max-width: $tablet-width) {
+		@include ccc;
+	}
+
+	@media (max-width: $mobile-width) {
+		height: auto;
+		width: 80vw;
+		@include ccc;
+
+		h4 {
+			display: none;
+		}
+
+		article {
+			height: 12vh;
+		}
+	}
+
+	@media (max-width: 300px) {
+		h2 {
+			font-size: 20px !important;
+			margin-top: 0 !important;
+		}
+	}
+
+	@media (max-width: 500px) {
+		article {
+			height: 60px;
+		}
+
+		h2 {
+			font-size: 30px !important;
+			margin-top: 0 !important;
+		}
+	}
+
+	@media (max-width: 1350px) {
+		article {
+			width: 80% !important;
+		}
+
+		h2 {
+			margin: 0 !important;
+		}
+	}
+}
+
+.portfolio-second {
+	display: grid;
+	grid-template-columns: repeat(4, 1fr);
+	grid-template-rows: repeat(3, 1fr);
+	gap: $grid-gap;
+
+	grid-template-areas:
+		'a a c c'
+		'b b c c'
+		'b b c c';
+
+	.a {
+		@include portfolioItem;
+		grid-area: a;
+	}
+
+	.b {
+		@include portfolioItem;
+		grid-area: b;
+	}
+
+	.c {
+		@include portfolioItem;
+		grid-area: c;
+		b {
+			color: $titleColor2;
+		}
+	}
+
+	article:last-of-type {
+		border-bottom-right-radius: 50px;
+	}
+
+	@media (max-width: $desktop-width) {
+		height: auto;
+		width: 80vw;
+		@include ccc;
+
+		.a {
+			height: $a-height-mobile;
+		}
+	}
+}
+
+.portfolio-square {
+	display: flex;
+	@include rcs;
+
+	@media (max-width: $desktop-width) {
+		height: auto;
+		width: 80vw;
+		@include rcc;
+
+		.portfolio-square-container {
+			width: 50% !important;
+		}
+
+		.title {
+			width: 80vw !important;
+		}
+	}
+
+	@media (max-width: $mobile-width) {
+		height: auto;
+		width: 80vw;
+		@include ccc;
+
+		.portfolio-square-container {
+			width: 100% !important;
+
+			.portfolio-square-container-top {
+				width: 100% !important;
+			}
+		}
+
+		.title {
+			width: 80vw;
+		}
+	}
+
+	.portfolio-square-container {
+		@include portfolioItem;
+		background-color: $boxDarkBlue;
+		overflow: hidden;
+		width: 25%;
+		height: 300px;
+		display: flex;
+		flex-direction: row;
+		flex-wrap: wrap;
+		justify-content: center;
+		align-items: center;
+
+		&:nth-child(odd) {
+			background-color: $boxDarkBlue2;
+		}
+
+		&:hover {
+			.portfolio-square-container-top,
+			ul {
+				transform: translateY(-300px);
+			}
+		}
+
+		.portfolio-square-container-top {
+			@include ccc;
+			width: 325px !important;
+			height: 300px !important;
+			font-weight: 700;
+			font-size: 20px;
+			color: #fff !important;
+			text-align: center;
+			transition: transform 0.5s ease;
+
+			h2 {
+				font-size: 16px;
+				width: 80%;
+				text-align: left;
+				margin-bottom: 15px;
+				color: $titleColor;
+			}
+
+			h3 {
+				font-size: 26px;
+				width: 80%;
+				text-align: left;
+			}
+
+			h4 {
+				font-size: 14px;
+				text-align: left;
+				width: 100%;
+				margin-top: 15px;
+				padding-left: 15px;
+			}
+		}
+
+		ul {
+			@include ccc;
+			height: 100%;
+			width: 80%;
+			transition: transform 0.5s ease;
+			margin: 0 !important;
+
+			li {
+				color: white;
+				margin-bottom: 15px;
+				text-align: left;
+				width: 100%;
+			}
+		}
+	}
+}
+
+.portfolio-fourth {
+	@include gridLayout(1fr repeat(6, 1fr), 1fr 1fr, 'a a a b b c c' 'a a a d d d d');
+
+	.a {
+		@include portfolioItem;
+		grid-area: a;
+	}
+
+	.b {
+		@include portfolioItem;
+		grid-area: b;
+	}
+
+	.c {
+		@include portfolioItem;
+		grid-area: c;
+	}
+
+	.d {
+		@include portfolioItem;
+		grid-area: d;
+	}
+
+	article:last-of-type {
+		border-bottom-right-radius: 50px;
+	}
+
+	@media (max-width: 800px) {
+		h2 {
+			font-size: 7vw !important;
+		}
+	}
+
+	@media (max-width: $desktop-width) {
+		width: 80vw;
+		height: auto;
+		@include gridLayout(1fr 1fr, 1fr 1fr 1fr, 'a a' 'b c' 'd d');
+	}
+
+	@media (max-width: $mobile-width) {
+		@include ccc;
+	}
+}
+
+.portfolio-fifth {
+	@include gridLayout(1fr 1fr, 1fr repeat(4, 1fr), 'a b' 'a b' 'a d' 'c d' 'c d');
+
+	.a {
+		@include portfolioItem;
+		grid-area: a;
+	}
+
+	.b {
+		@include portfolioItem;
+		grid-area: b;
+	}
+
+	.c {
+		@include portfolioItem;
+		grid-area: c;
+	}
+
+	.d {
+		@include portfolioItem;
+		grid-area: d;
+	}
+
+	article:last-of-type {
+		border-bottom-right-radius: 50px;
+	}
+
+	@media (max-width: 800px) {
+		h3 {
+			font-size: 7vw !important;
+		}
+	}
+
+	@media (max-width: $mobile-width) {
+		height: auto;
+		width: 80vw !important; // L'utilisation de !important peut être nécessaire pour surpasser des styles spécifiques
+		@include ccc; // Assure-toi que le mixin 'ccc' est bien défini
+
+		img {
+			display: none;
+		}
+	}
+
+	@media (max-width: $desktop-width) {
+		height: auto;
+		width: 80vw !important;
+		@include ccc; // Réutilisation du mixin 'ccc' pour la cohérence
+
+		img {
+			display: none; // Masquer les images sur les écrans plus petits
+		}
+	}
+}
+
+.portfolio-sixth {
+	@include gridLayout(1fr 1fr, 1fr repeat(4, 1fr), 'a b' 'a b' 'a d' 'c d' 'c d');
+
+	.a {
+		@include portfolioItem;
+		grid-area: a;
+	}
+
+	.b {
+		@include portfolioItem;
+		grid-area: b;
+	}
+
+	.c {
+		@include portfolioItem;
+		grid-area: c;
+	}
+
+	.d {
+		@include portfolioItem;
+		grid-area: d;
+	}
+
+	article:last-of-type {
+		border-bottom-right-radius: 50px;
+	}
+
+	@media (max-width: 800px) {
+		h2 {
+			font-size: 7vw !important;
+		}
+	}
+
+	@media (max-width: $mobile-width) {
+		height: auto;
+		width: 80vw !important; // L'utilisation de !important peut être nécessaire pour surpasser des styles spécifiques
+		@include ccc; // Assure-toi que le mixin 'ccc' est bien défini
+
+		img {
+			display: none;
+		}
+	}
+
+	@media (max-width: $desktop-width) {
+		height: auto;
+		width: 80vw !important;
+		@include ccc; // Réutilisation du mixin 'ccc' pour la cohérence
+
+		img {
+			display: none; // Masquer les images sur les écrans plus petits
+		}
+	}
+}
+
+.portfolio-footer {
+	@include ccc; // Assure-toi que le mixin 'ccc' est bien défini
+	width: 100%;
+	min-height: 200px;
+	margin: 15px 0 15px; // Mise à jour pour inclure la marge supérieure de 70px
+	height: 300px;
+	background: $footerGradient;
+	border-bottom-right-radius: 50px;
+	border-bottom-left-radius: 50px;
+	justify-content: center !important; // Utilisation prudente de !important
+	flex-direction: column !important; // Utilisation prudente de !important
+
+	h2 {
+		color: white;
+	}
+
+	a {
+		background: white;
+		padding: 20px 30px;
+		border: none;
+		color: $color-text;
+		font-size: 18px;
+		border-radius: 10px;
+		text-decoration: none;
+	}
+
+	@media (max-width: $desktop-width) {
+		height: auto;
+		width: 80vw !important; // L'utilisation de !important peut être nécessaire pour surpasser des styles spécifiques
+		@include ccc; // Assure-toi que le mixin 'ccc' est réutilisé pour la cohérence
+	}
+}

@@ -4,8 +4,8 @@
 	import type { Section } from '$lib/components/threlte/utils/Functions/sectionTransition';
 
 	const links: { href: string; label: string; section: Section }[] = [
-		{ href: '/', label: 'Accueil', section: 'home' },
 		{ href: '/dev', label: 'Dev', section: 'dev' },
+		{ href: '/', label: 'Accueil', section: 'home' },
 		{ href: '/music', label: 'Music', section: 'music' }
 	];
 
