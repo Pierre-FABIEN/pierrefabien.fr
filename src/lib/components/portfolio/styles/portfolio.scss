@@ -64,6 +64,19 @@
 
 		.header-container {
 			pointer-events: auto;
+			max-height: calc(100dvh - 60px);
+		}
+
+		.menu-container {
+			overflow-y: auto;
+			overscroll-behavior: contain;
+			max-height: calc(100dvh - 80px);
+		}
+	}
+
+	@media (max-width: 800px) {
+		.itemsContainer .item .content h1 span {
+			font-size: 17px;
 		}
 	}
 }

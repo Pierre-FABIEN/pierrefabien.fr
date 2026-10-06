@@ -86,7 +86,7 @@
 				src="/portfolio/LightHouse.webp"
 				alt="Analyse Lighthouse le 03/04/2024"
 				width="800"
-				height="500"
+				height="159"
 				loading="lazy"
 			/>
 

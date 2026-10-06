@@ -2,11 +2,12 @@
 	import { gsap } from 'gsap';
 	import { onMount } from 'svelte';
 	import { PortfolioMenuData } from './data';
+	import { firstLoadComplete } from '$lib/store/initialLoaderStore';
 	import { scrollToSection } from './stores/portfolioStores';
-	import DarkMode from './DarkMode.svelte';
 	import FullScreen from './FullScreen.svelte';
 	import MenuIcon from './svg/MenuIcon.svelte';
 
+	let bar: HTMLElement;
 	let panel: HTMLElement;
 	let contentMenu: HTMLElement;
 	let isMenuExpanded = $state(false);
@@ -16,7 +17,27 @@
 		portfolioItems = Array.from(panel.querySelectorAll<HTMLElement>('article'));
 		gsap.set(portfolioItems, { duration: 0.2, stagger: 0.04, opacity: 0, y: '20px' });
 
-		return () => gsap.killTweensOf([panel, contentMenu, ...portfolioItems]);
+		let unsubscribe: (() => void) | undefined;
+		if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+			gsap.set(bar, { yPercent: 100, autoAlpha: 0 });
+			unsubscribe = firstLoadComplete.subscribe((complete) => {
+				if (!complete) return;
+				gsap.to(bar, {
+					yPercent: 0,
+					autoAlpha: 1,
+					duration: 0.9,
+					delay: 0.3,
+					ease: 'power3.out',
+					clearProps: 'transform,opacity,visibility'
+				});
+				queueMicrotask(() => unsubscribe?.());
+			});
+		}
+
+		return () => {
+			unsubscribe?.();
+			gsap.killTweensOf([bar, panel, contentMenu, ...portfolioItems]);
+		};
 	});
 
 	const handleMenu = () => {
@@ -53,9 +74,15 @@
 	}
 </script>
 
-<header>
+<header bind:this={bar} data-leave-down>
 	<div bind:this={panel} class="header-container">
-		<div bind:this={contentMenu} class="menu-container">
+		<div
+			bind:this={contentMenu}
+			class="menu-container"
+			onwheel={(event) => event.stopPropagation()}
+			ontouchstart={(event) => event.stopPropagation()}
+			ontouchmove={(event) => event.stopPropagation()}
+		>
 			<div class="portfolio-menu">
 				{#each PortfolioMenuData as { id, title, content, position } (id)}
 					<!-- svelte-ignore a11y_no_noninteractive_element_to_interactive_role -->
@@ -100,8 +127,6 @@
 		</div>
 
 		<div class="left-side">
-			<DarkMode />
-
 			<FullScreen />
 		</div>
 	</div>

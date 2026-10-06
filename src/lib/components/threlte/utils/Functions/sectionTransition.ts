@@ -52,6 +52,8 @@ export async function navigateToSection(section: Section, href: string): Promise
 	if (navigationInProgress) return;
 	navigationInProgress = true;
 	const content = document.querySelector<HTMLElement>('[data-route-content]');
+	// Les éléments [data-leave-down] (ex: barre du portfolio) redescendent hors de l'écran.
+	const leaving = gsap.utils.toArray<HTMLElement>('[data-leave-down]');
 	const homeSnap = ScrollTrigger.getById('home-section-snap');
 	homeSnap?.disable(false);
 	try {
@@ -67,12 +69,15 @@ export async function navigateToSection(section: Section, href: string): Promise
 		}
 		if (content && get(activeSection) !== 'home') {
 			await new Promise<void>((resolve) => {
-				gsap.to(content, {
-					opacity: 0,
-					duration: 0.3,
-					ease: 'power2.out',
-					onComplete: resolve
-				});
+				const timeline = gsap.timeline({ onComplete: resolve });
+				timeline.to(content, { opacity: 0, duration: 0.3, ease: 'power2.out' }, 0);
+				if (leaving.length) {
+					timeline.to(
+						leaving,
+						{ yPercent: 100, autoAlpha: 0, duration: 0.5, ease: 'power3.in' },
+						0
+					);
+				}
 			});
 		}
 		if (section !== 'home') {
@@ -88,6 +93,7 @@ export async function navigateToSection(section: Section, href: string): Promise
 		await goto(href);
 	} finally {
 		if (content) gsap.set(content, { clearProps: 'opacity' });
+		if (leaving.length) gsap.set(leaving, { clearProps: 'transform,opacity,visibility' });
 		if (get(activeSection) === 'home') homeSnap?.enable(false, false);
 		navigationInProgress = false;
 	}
