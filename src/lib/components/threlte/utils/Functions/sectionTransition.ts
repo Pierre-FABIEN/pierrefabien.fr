@@ -5,7 +5,9 @@
 import gsap from 'gsap';
 import * as THREE from 'three';
 import { get } from 'svelte/store';
+import { tick } from 'svelte';
 import { goto } from '$app/navigation';
+import SmoothScrollBarStore from '$lib/store/SmoothScrollBarStore';
 import {
 	desiredTarget,
 	activeSection,
@@ -50,6 +52,16 @@ export async function navigateToSection(section: Section, href: string): Promise
 	navigationInProgress = true;
 	const content = document.querySelector<HTMLElement>('[data-route-content]');
 	try {
+		if (get(activeSection) === 'home') {
+			const { smoothScroll } = get(SmoothScrollBarStore);
+			if (smoothScroll && smoothScroll.offset.y > 0) {
+				smoothScroll.setMomentum(0, 0);
+				await new Promise<void>((resolve) => {
+					smoothScroll.scrollTo(0, 0, 600, { callback: () => resolve() });
+				});
+				await tick();
+			}
+		}
 		if (content && get(activeSection) !== 'home') {
 			await new Promise<void>((resolve) => {
 				gsap.to(content, {
