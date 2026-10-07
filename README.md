@@ -29,7 +29,6 @@ npm run preview
 ```bash
 npm run check   # svelte-check
 npm run lint    # prettier + eslint
-npm run test    # vitest + playwright
 ```
 
 ## Pipeline modèles 3D

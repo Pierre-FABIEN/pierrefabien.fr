@@ -13,9 +13,20 @@
 	import Loader from '$lib/components/loader/Loader.svelte';
 	import SiteNav from '$lib/components/SiteNav.svelte';
 	import { page } from '$app/state';
+	import { afterNavigate } from '$app/navigation';
+	import { get } from 'svelte/store';
+	import SmoothScrollBarStore from '$lib/store/SmoothScrollBarStore';
 	import type { Component } from 'svelte';
 
 	let { children } = $props();
+
+	afterNavigate(({ from, to }) => {
+		if (!from || !to || from.route.id === to.route.id) return;
+		const scroll = get(SmoothScrollBarStore).smoothScroll;
+		if (!scroll || scroll.offset.y === 0) return;
+		scroll.setMomentum(0, 0);
+		scroll.setPosition(0, 0);
+	});
 
 	// Chargée dynamiquement après le montage pour ne pas inclure Three.js/Threlte/GSAP
 	// dans le bundle JS initial (retarderait le Time To Interactive).

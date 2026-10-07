@@ -3,7 +3,6 @@
 // pour obtenir une pure rotation vers le haut (pas de déplacement). La
 // résolution de la Promise permet d'attendre la fin avant d'appeler goto().
 import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/dist/ScrollTrigger';
 import * as THREE from 'three';
 import { get } from 'svelte/store';
 import { tick } from 'svelte';
@@ -54,8 +53,6 @@ export async function navigateToSection(section: Section, href: string): Promise
 	const content = document.querySelector<HTMLElement>('[data-route-content]');
 	// Les éléments [data-leave-down] (ex: barre du portfolio) redescendent hors de l'écran.
 	const leaving = gsap.utils.toArray<HTMLElement>('[data-leave-down]');
-	const homeSnap = ScrollTrigger.getById('home-section-snap');
-	homeSnap?.disable(false);
 	try {
 		if (get(activeSection) === 'home') {
 			const { smoothScroll } = get(SmoothScrollBarStore);
@@ -79,6 +76,10 @@ export async function navigateToSection(section: Section, href: string): Promise
 					);
 				}
 			});
+			// Contenu invisible : le saut au sommet ne se voit pas.
+			const { smoothScroll } = get(SmoothScrollBarStore);
+			smoothScroll?.setMomentum(0, 0);
+			smoothScroll?.setPosition(0, 0);
 		}
 		if (section !== 'home') {
 			activeSection.set(section);
@@ -94,7 +95,6 @@ export async function navigateToSection(section: Section, href: string): Promise
 	} finally {
 		if (content) gsap.set(content, { clearProps: 'opacity' });
 		if (leaving.length) gsap.set(leaving, { clearProps: 'transform,opacity,visibility' });
-		if (get(activeSection) === 'home') homeSnap?.enable(false, false);
 		navigationInProgress = false;
 	}
 }

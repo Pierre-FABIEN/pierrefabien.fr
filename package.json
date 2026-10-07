@@ -13,15 +13,10 @@
 		"prettier:watch": "chokidar \"src/**/*.{js,ts,svelte,scss}\" -c \"npm run prettier:single -- {path}\"",
 		"prettier:single": "prettier --write",
 		"prettier": "prettier --write \"src/**/*.{js,ts,svelte,scss}\"",
-		"test:unit": "vitest",
-		"test": "npm run test:unit -- --run && npm run test:e2e",
-		"test:e2e": "playwright test",
 		"model-pipeline:run": "node scripts/model-pipeline.js"
 	},
 	"devDependencies": {
 		"@internationalized/date": "^3.5.6",
-		"@tanstack/table-core": "^8.20.5",
-		"@playwright/test": "^1.45.3",
 		"@sveltejs/adapter-static": "^3.0.0",
 		"@sveltejs/kit": "^2.12.0",
 		"@sveltejs/vite-plugin-svelte": "^4.0.0",
@@ -29,6 +24,7 @@
 		"@tailwindcss/container-queries": "^0.1.1",
 		"@tailwindcss/forms": "^0.5.9",
 		"@tailwindcss/typography": "^0.5.15",
+		"@tanstack/table-core": "^8.20.5",
 		"@types/eslint": "^9.6.0",
 		"autoprefixer": "^10.4.20",
 		"bits-ui": "^1.0.0-next.45",
@@ -61,7 +57,6 @@
 		"vaul-svelte": "^1.0.0-next.2",
 		"vite": "^5.0.3",
 		"vite-plugin-mkcert": "^1.17.6",
-		"vitest": "^2.0.4",
 		"zod": "^3.23.8"
 	},
 	"dependencies": {
