@@ -45,6 +45,8 @@
 	let batLight: THREE.PointLight | undefined = $state();
 	let batIntensity = 1; // Vous pouvez ajuster l'intensité selon vos besoins
 	const humansIntensity = 0.05;
+	const humansLightIntensity = 40; // candelas à allumage : la lumière est loin des figures (decay 1)
+	let humansLight: THREE.PointLight | undefined = $state();
 
 	// Références des objets
 	let letterD: THREE.Mesh | undefined = $state();
@@ -105,6 +107,17 @@
 
 		// Même émission lumineuse sur le mesh Humans
 		applyEmissive(humansNode, new THREE.Color(0xffffff), humansIntensity);
+	});
+
+	// La lumière des Humans est placée au centre de leur géométrie et portée sur sa taille.
+	$effect(() => {
+		if (!humansNode || !humansLight) return;
+		const geometry = humansNode.geometry;
+		geometry.computeBoundingBox();
+		if (!geometry.boundingBox) return;
+		const size = geometry.boundingBox.getSize(new THREE.Vector3());
+		geometry.boundingBox.getCenter(humansLight.position);
+		humansLight.distance = size.length() * humansNode.scale.x;
 	});
 
 	// État de clignotement par objet (lettre ou bat) : une phase "stable" longue
@@ -212,6 +225,11 @@
 		// Rotation du humansNode (visible seulement à partir du 2e écran)
 		if (humansNode && $disableAnimationsHome) {
 			updateBlink('humans', delta, undefined, humansNode, humansIntensity);
+			if (humansLight && humansNode.material instanceof THREE.MeshStandardMaterial) {
+				// La lumière suit le clignotement de l'émission (allumée/éteinte).
+				humansLight.intensity =
+					(humansNode.material.emissiveIntensity / (humansIntensity * 5)) * humansLightIntensity;
+			}
 			// Ajouter une rotation autour de l'axe Y
 			humansNode.rotation.y += delta * 0.1; // Ajustez la vitesse de rotation (0.1 est un exemple)
 			humansNode.updateMatrixWorld(); // Mettez à jour la matrice du monde
@@ -270,7 +288,9 @@
 				material={gltf.nodes.Humans.material}
 				position={[-30, 0, 0]}
 				scale={2}
-			/>
+			>
+				<T.PointLight bind:ref={humansLight} color="#FFFFFF" intensity={0} decay={1} />
+			</T.Mesh>
 
 			<T.Mesh
 				castShadow
