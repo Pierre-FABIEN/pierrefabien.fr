@@ -44,6 +44,7 @@
 	let batNode: THREE.Mesh | undefined = $state();
 	let batLight: THREE.PointLight | undefined = $state();
 	let batIntensity = 1; // Vous pouvez ajuster l'intensité selon vos besoins
+	const humansIntensity = 0.05;
 
 	// Références des objets
 	let letterD: THREE.Mesh | undefined = $state();
@@ -101,10 +102,13 @@
 			batMaterial.emissiveIntensity = batIntensity * 5;
 			if (batNode) batNode.frustumCulled = false;
 		}
+
+		// Même émission lumineuse sur le mesh Humans
+		applyEmissive(humansNode, new THREE.Color(0xffffff), humansIntensity);
 	});
 
 	// État de clignotement par objet (lettre ou bat) : une phase "stable" longue
-	// (lumière fixe) entrecoupée de courtes rafales d'à-coups façon néon défaillant.
+	// (lumière éteinte) entrecoupée de courtes rafales d'allumages façon néon défaillant.
 	interface BlinkState {
 		timer: number;
 		phaseDuration: number;
@@ -148,7 +152,7 @@
 				phaseDuration: randomStableDuration(),
 				glitchStepsLeft: 0
 			};
-			applyLightIntensity(light, mesh, intensity * 5);
+			applyLightIntensity(light, mesh, 0);
 			return;
 		}
 
@@ -159,19 +163,19 @@
 		if (state.glitchStepsLeft > 0) {
 			state.glitchStepsLeft--;
 			if (state.glitchStepsLeft === 0) {
-				// fin de la rafale : la lumière se stabilise à nouveau
-				applyLightIntensity(light, mesh, intensity * 5);
+				// fin de la rafale : la lumière retombe éteinte
+				applyLightIntensity(light, mesh, 0);
 				state.phaseDuration = randomStableDuration();
 			} else {
-				// contraste franc tout-ou-rien (plus intense qu'un simple palier de luminosité)
-				const isOffStep = state.glitchStepsLeft % 2 === 0;
-				applyLightIntensity(light, mesh, isOffStep ? 0 : intensity * 5);
+				// contraste franc tout-ou-rien : la lumière s'allume par à-coups
+				const isOnStep = state.glitchStepsLeft % 2 === 1;
+				applyLightIntensity(light, mesh, isOnStep ? intensity * 5 : 0);
 				state.phaseDuration = randomGlitchStepDuration();
 			}
 			return;
 		}
 
-		// 65% de chance de déclencher une rafale de 4 à 8 à-coups avant de se restabiliser
+		// 65% de chance de déclencher une rafale de 4 à 8 à-coups avant de retomber éteint
 		if (Math.random() < 0.65) {
 			state.glitchStepsLeft = 4 + Math.floor(Math.random() * 5);
 			state.phaseDuration = randomGlitchStepDuration();
@@ -207,6 +211,7 @@
 
 		// Rotation du humansNode (visible seulement à partir du 2e écran)
 		if (humansNode && $disableAnimationsHome) {
+			updateBlink('humans', delta, undefined, humansNode, humansIntensity);
 			// Ajouter une rotation autour de l'axe Y
 			humansNode.rotation.y += delta * 0.1; // Ajustez la vitesse de rotation (0.1 est un exemple)
 			humansNode.updateMatrixWorld(); // Mettez à jour la matrice du monde

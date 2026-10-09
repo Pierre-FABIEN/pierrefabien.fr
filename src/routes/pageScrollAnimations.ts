@@ -14,6 +14,112 @@ import {
 
 gsap.registerPlugin(ScrollTrigger);
 
+interface TextRevealOptions {
+	composition: string;
+	chars: string;
+	trigger: string;
+	start: string;
+	// Distances de scroll (en hauteurs d'écran) de l'apparition et de la disparition.
+	revealSpan: number;
+	exitSpan?: number;
+	// Élément hors lettres (label) qui s'efface en premier à la sortie.
+	label?: string;
+	from: () => number;
+	to: () => number;
+}
+
+// Le bloc de texte reste fixe à l'écran pendant l'arrivée de sa section, tandis que le contour de
+// ses lettres se dessine une à une ; puis, si `exitSpan` est donné, il reste fixe pendant que les
+// lettres s'effacent dans le même ordre. Tout est lié au scroll (scrub exact) ; `from`/`to` donnent
+// le décalage vertical de départ et d'arrivée.
+function createTextReveal({
+	composition,
+	chars,
+	trigger,
+	start,
+	revealSpan,
+	exitSpan = 0,
+	label,
+	from,
+	to
+}: TextRevealOptions) {
+	const block = document.querySelector<HTMLElement>(composition);
+	const letters = gsap.utils.toArray<HTMLElement>(chars);
+	if (!block || !letters.length || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+		return undefined;
+	}
+
+	// Chaque lettre rejoint la couleur que le CSS lui donne (blanc, ou orange pour le &).
+	const finalColors = letters.map((letter) => getComputedStyle(letter).color);
+	const transparent = (color: string) => color.replace('rgb(', 'rgba(').replace(')', ', 0)');
+	const waveDuration = 0.12 * revealSpan;
+	const stagger = { each: (revealSpan - waveDuration) / (letters.length - 1) };
+
+	const timeline = gsap
+		.timeline({
+			defaults: { ease: 'none' },
+			scrollTrigger: {
+				trigger,
+				start,
+				end: () => `+=${(revealSpan + exitSpan) * window.innerHeight}`,
+				scrub: true,
+				invalidateOnRefresh: true
+			}
+		})
+		.fromTo(block, { y: from }, { y: to, duration: revealSpan }, 0)
+		.fromTo(block, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.04 * revealSpan }, 0)
+		.fromTo(
+			letters,
+			{ color: (index: number) => transparent(finalColors[index]) },
+			{
+				color: (index: number) => finalColors[index],
+				duration: waveDuration,
+				ease: 'power1.inOut',
+				stagger
+			},
+			0
+		);
+
+	if (exitSpan > 0) {
+		// Le décalage compense exactement le scroll : le bloc reste immobile à l'écran.
+		timeline
+			.fromTo(
+				block,
+				{ y: to },
+				{
+					y: () => to() + exitSpan * window.innerHeight,
+					duration: exitSpan,
+					immediateRender: false
+				},
+				revealSpan
+			)
+			.fromTo(
+				letters,
+				{ color: (index: number) => finalColors[index] },
+				{
+					color: (index: number) => transparent(finalColors[index]),
+					duration: 0.12 * exitSpan,
+					ease: 'power1.inOut',
+					immediateRender: false,
+					stagger: { each: (0.88 * exitSpan) / (letters.length - 1) }
+				},
+				revealSpan
+			);
+
+		const labelElement = label ? block.querySelector<HTMLElement>(label) : null;
+		if (labelElement) {
+			timeline.fromTo(
+				labelElement,
+				{ opacity: getComputedStyle(labelElement).opacity },
+				{ opacity: 0, duration: 0.12 * exitSpan, ease: 'power1.inOut', immediateRender: false },
+				revealSpan
+			);
+		}
+	}
+
+	return timeline;
+}
+
 export function initScrollAnimations(): () => void {
 	const cameraPos = { x: -25, y: 7, z: 0 };
 	const cameraTgt = { x: 0, y: 2, z: 0 };
@@ -30,49 +136,33 @@ export function initScrollAnimations(): () => void {
 			})
 		: undefined;
 
-	// Le texte de .about reste fixe aux 3/4 de l'écran du milieu de l'intersection 1/2 jusqu'au
-	// centrage de la section 2, pendant que le contour blanc de ses lettres (remplissage
-	// transparent) se dessine lettre par lettre (scrub exact).
-	const aboutText = document.querySelector<HTMLElement>('.about .about-text');
-	const chars = gsap.utils.toArray<HTMLElement>('.about .char');
-	const revealTimeline =
-		aboutText && chars.length && !window.matchMedia('(prefers-reduced-motion: reduce)').matches
-			? gsap.timeline({
-					defaults: { ease: 'none' },
-					scrollTrigger: {
-						trigger: '.about',
-						start: 'top 50%',
-						end: 'top top',
-						scrub: true,
-						invalidateOnRefresh: true
-					}
-				})
-			: undefined;
-
-	if (revealTimeline && aboutText) {
-		const wave = 0.12;
-		// Position verticale du texte en fraction de la hauteur d'écran (0 = haut, 1 = bas).
-		const line = 0.75;
-		revealTimeline
-			.fromTo(
-				aboutText,
-				{ y: () => (line - 1) * window.innerHeight },
-				{ y: () => (line - 0.5) * window.innerHeight, duration: 1 },
-				0
-			)
-			.fromTo(aboutText, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.04 }, 0)
-			.fromTo(
-				chars,
-				{ color: 'rgba(255, 255, 255, 0)' },
-				{
-					color: '#fff',
-					duration: wave,
-					ease: 'power1.inOut',
-					stagger: { each: (1 - wave) / (chars.length - 1) }
-				},
-				0
-			);
-	}
+	// Textes des sections 2 et 3 : contour dessiné lettre par lettre, bloc fixe pendant l'arrivée.
+	const reveals = [
+		// Aux 3/4 de l'écran (0 = haut, 1 = bas), du milieu de l'intersection 1/2 jusqu'au centrage.
+		createTextReveal({
+			composition: '.about .about-composition',
+			chars: '.about .char',
+			trigger: '.about',
+			start: 'top 50%',
+			revealSpan: 0.5,
+			// Disparition finie avant l'arrivée du texte de .suite (about top à -70 %).
+			exitSpan: 0.6,
+			label: '.about-label',
+			from: () => (0.75 - 1) * window.innerHeight,
+			to: () => (0.75 - 0.5) * window.innerHeight
+		}),
+		// En bas de l'écran : fixe depuis le tiers bas de l'intersection 2/3, puis reste fixe pendant sa disparition.
+		createTextReveal({
+			composition: '.suite .suite-composition',
+			chars: '.suite .char',
+			trigger: '.suite',
+			start: 'top 30%',
+			revealSpan: 0.3,
+			exitSpan: 0.6,
+			from: () => -0.3 * window.innerHeight,
+			to: () => 0
+		})
+	];
 
 	// ScrollTrigger pour désactiver les animations liées à la souris
 	const scrollTrigger1 = ScrollTrigger.create({
@@ -96,7 +186,7 @@ export function initScrollAnimations(): () => void {
 			const progress = self.progress;
 
 			const newCameraPosition = {
-				x: THREE.MathUtils.lerp(-25, -50, progress),
+				x: THREE.MathUtils.lerp(-25, -70, progress),
 				y: THREE.MathUtils.lerp(7, 2, progress),
 				z: 0
 			};
@@ -170,8 +260,10 @@ export function initScrollAnimations(): () => void {
 	});
 
 	return () => {
-		revealTimeline?.scrollTrigger?.kill();
-		revealTimeline?.kill();
+		reveals.forEach((timeline) => {
+			timeline?.scrollTrigger?.kill();
+			timeline?.kill();
+		});
 		cueTween?.scrollTrigger?.kill();
 		cueTween?.kill();
 		scrollTrigger1.kill();

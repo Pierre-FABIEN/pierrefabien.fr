@@ -131,7 +131,7 @@
 			helpers={false}
 			intensity={$pointLightIntensity}
 			position={[-30, 10, 0]}
-			distance={50}
+			distance={80}
 			penumbra={1}
 			angle={Math.PI / 4}
 			targetPosition={[-30, 0, 0]}
